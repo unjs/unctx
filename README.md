@@ -10,7 +10,7 @@
 
 ## What is it?
 
-[Vue.js](https://vuejs.org) introduced an amazing pattern called [Composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that allows organizing complex logic by spliting it into reusable functions and grouping in logical order. `unctx` allows easily implementing composition api pattern in your javascript libraries without hassle.
+[Vue.js](https://vuejs.org) introduced an amazing pattern called [Composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that allows organizing complex logic by splitting it into reusable functions and grouping in logical order. `unctx` allows easily implementing composition api pattern in your javascript libraries without hassle.
 
 ## Integration
 
@@ -49,11 +49,7 @@ function setup() {
 
 ## Using Namespaces
 
-Composition of functions is possible using temporary context injection. Under the hood a temporary singleton variable is kept (per context)
-
-To avoid issues with multiple instances of library, `unctx` provides a safe global namespace to access contexts with (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis))
-
-**Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended.
+To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
 
 ```js
 import { useContext } from 'unctx'
@@ -61,7 +57,7 @@ import { useContext } from 'unctx'
 const { use: useAwesome, call } = useContext('awesome-lib')
 ```
 
-You can also create your own internal namespace with `createNamespace` utility for more advanced usecases.
+You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.
 
 ## Typescript
 
@@ -72,11 +68,15 @@ A generic type exists on all utilities to be set for instance/context type:
 const { use: useAwesome } = createContext<Awesome>()
 ```
 
+## Under the hood
+
+Composition of functions is possible using temporary context injection. When calling `ctx.call(instance, cb)`, `instance` argument will be stored in a temporary variable then `cb` is called. Any function inside `cb`, can then implicitly access instance by using `ctx.use` (or `useAwesome`)
+
 ## Pitfalls
 
 **context can be only used before first await**:
 
- To avoid leaking context, `call` method synchronously sets context and unsets it as soon as possible. Because of this, `useAwesome` should happen before first `await` call and reused if necessary.
+ To avoid leaking context, `call` method synchronously sets context and unset it as soon as possible. Because of this, `useAwesome` should happen before first `await` call and reused if necessary.
 
 ```js
 async function setup() {
