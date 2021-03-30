@@ -52,9 +52,12 @@ function setup() {
 To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
 
 ```js
-import { useContext } from 'unctx'
+import { useContext, getContext } from 'unctx'
 
-const { use: useAwesome, call } = useContext('awesome-lib')
+const useAwesome = useContext('awesome-lib')
+
+// or
+// const awesomeContext = getContext('awesome-lib')
 ```
 
 You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.

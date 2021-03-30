@@ -53,4 +53,6 @@ const globalKey = '__unctx__'
 export const defaultNamespace: ContextNamespace =
   _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace())
 
-export const useContext = <T>(key: string) => defaultNamespace.get<T>(key)
+export const getContext = <T>(key: string) => defaultNamespace.get<T>(key)
+
+export const useContext = <T>(key: string) => getContext<T>(key).use
