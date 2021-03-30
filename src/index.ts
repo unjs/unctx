@@ -29,11 +29,12 @@ export function createNamespace () {
   const contexts: Record<string, UseContext<any>> = {}
 
   return {
-    get<T> (key) {
+    get (key) {
       if (!contexts[key]) {
         contexts[key] = createContext()
       }
-      contexts[key] as UseContext<T>
+      contexts[key] as UseContext<any>
+      return contexts[key]
     }
   }
 }
