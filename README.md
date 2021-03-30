@@ -14,7 +14,7 @@
 
 ## Integration
 
-In you **awesome** library:
+In your **awesome** library:
 
 ```bash
 yarn add unctx
