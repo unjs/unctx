@@ -1,0 +1,33 @@
+{
+  "name": "unctx",
+  "version": "0.0.0",
+  "description": "Composition-api in Vanilla js",
+  "repository": "unjs/unctx",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "siroc build",
+    "dev": "jest --watch",
+    "lint": "eslint --ext .ts,.js .",
+    "prepublishOnly": "yarn build",
+    "release": "yarn test && standard-version && git push --follow-tags && npm publish",
+    "test": "yarn lint && yarn jest"
+  },
+  "devDependencies": {
+    "@nuxtjs/eslint-config-typescript": "latest",
+    "@types/jest": "latest",
+    "@types/node": "latest",
+    "eslint": "latest",
+    "jest": "latest",
+    "siroc": "latest",
+    "standard-version": "latest",
+    "ts-jest": "latest",
+    "typescript": "latest"
+  }
+}
