@@ -14,9 +14,14 @@ export function createContext<T = any> (): UseContext<T> {
         throw new Error('Context conflict')
       }
       currentInstance = instance
-      const res = cb()
-      currentInstance = null
-      return res
+      try {
+        const res = cb()
+        currentInstance = null
+        return res
+      } catch (err) {
+        currentInstance = null
+        throw err
+      }
     }
   }
 }

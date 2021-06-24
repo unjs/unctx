@@ -20,6 +20,13 @@ describe('createContext', () => {
     })
   })
 
+  it('unset on error', () => {
+    const ctx = createContext()
+    const throwError = () => { throw new Error('Foo') }
+    expect(() => ctx.call('A', throwError)).toThrow('Foo')
+    expect(() => ctx.call('B', throwError)).toThrow('Foo')
+  })
+
   it('use async', async () => {
     const ctx = createContext()
     expect(ctx.use()).toBe(null)
