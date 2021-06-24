@@ -46,3 +46,29 @@ describe('namespace', () => {
     expect(ns.get('A')).toBe(ns.get('A'))
   })
 })
+
+describe('singleton', () => {
+  it('set/unset', () => {
+    const ctx = createContext()
+    expect(ctx.use()).toBe(null)
+    ctx.set('A')
+    ctx.set('A')
+    expect(ctx.use()).toBe('A')
+    expect(ctx.use()).toBe('A')
+    ctx.unset()
+    expect(ctx.use()).toBe(null)
+  })
+
+  it('conflict', () => {
+    const ctx = createContext()
+    ctx.set('A')
+    expect(() => ctx.set('B')).toThrow('Context conflict')
+  })
+
+  it('replace', () => {
+    const ctx = createContext()
+    ctx.set('A')
+    ctx.set('B', true)
+    expect(ctx.use()).toBe('B')
+  })
+})

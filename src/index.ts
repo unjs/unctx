@@ -1,18 +1,33 @@
 
 export interface UseContext<T> {
   use: () => T | null
-  call: <R>(ctx: T, cb: () => R) => R
+  set: (instance?: T, replace?: Boolean) => void
+  unset: () => void
+  call: <R>(instance: T, cb: () => R) => R
 }
 
 export function createContext<T = any> (): UseContext<T> {
   let currentInstance: T = null
 
+  const checkConflict = (instance: T) => {
+    if (currentInstance && currentInstance !== instance) {
+      throw new Error('Context conflict')
+    }
+  }
+
   return {
     use: () => currentInstance,
-    call: (instance: T, cb) => {
-      if (currentInstance && currentInstance !== instance) {
-        throw new Error('Context conflict')
+    set: (instance: T, replace?: Boolean) => {
+      if (!replace) {
+        checkConflict(instance)
       }
+      currentInstance = instance
+    },
+    unset: () => {
+      currentInstance = null
+    },
+    call: (instance: T, cb) => {
+      checkConflict(instance)
       currentInstance = instance
       try {
         const res = cb()

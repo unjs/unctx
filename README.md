@@ -62,6 +62,24 @@ const useAwesome = useContext('awesome-lib')
 
 You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.
 
+## Singleton Pattern
+
+If you are sure it is safe to use a shared instance (not depending to request), you can also use `ctx.set` and `ctx.unset` for a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
+
+**Note:** You cannot combine `set` with `call`. Always use `unset` before replacing instance otherwise you will get `Context conflict` error.
+
+```js
+import { createContext } from 'unctx'
+
+const ctx = createContext()
+ctx.set(new Awesome())
+
+// Replacing instance without unset
+// ctx.set(new Awesome(), true)
+
+export const useAwesome = ctx.use
+```
+
 ## Typescript
 
 A generic type exists on all utilities to be set for instance/context type:
