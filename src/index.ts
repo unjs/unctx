@@ -8,6 +8,7 @@ export interface UseContext<T> {
 
 export function createContext<T = any> (): UseContext<T> {
   let currentInstance: T = null
+  let isSingleton = false
 
   const checkConflict = (instance: T) => {
     if (currentInstance && currentInstance !== instance) {
@@ -22,19 +23,25 @@ export function createContext<T = any> (): UseContext<T> {
         checkConflict(instance)
       }
       currentInstance = instance
+      isSingleton = true
     },
     unset: () => {
       currentInstance = null
+      isSingleton = false
     },
     call: (instance: T, cb) => {
       checkConflict(instance)
       currentInstance = instance
       try {
         const res = cb()
-        currentInstance = null
+        if (!isSingleton) {
+          currentInstance = null
+        }
         return res
       } catch (err) {
-        currentInstance = null
+        if (!isSingleton) {
+          currentInstance = null
+        }
         throw err
       }
     }

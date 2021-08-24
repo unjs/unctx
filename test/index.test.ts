@@ -59,6 +59,13 @@ describe('singleton', () => {
     expect(ctx.use()).toBe(null)
   })
 
+  it('call compatibility', () => {
+    const ctx = createContext()
+    ctx.set('A')
+    ctx.call('A', () => {})
+    expect(ctx.use()).toBe('A')
+  })
+
   it('conflict', () => {
     const ctx = createContext()
     ctx.set('A')
