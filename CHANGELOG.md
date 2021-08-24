@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://github.com/unjs/unctx/compare/v1.0.1...v1.0.2) (2021-08-24)
+
+
+### Bug Fixes
+
+* **call:** don't set instance to null when using singleton ([248dc32](https://github.com/unjs/unctx/commit/248dc3218e70238a6091cf5707bafbeb2d1fd91f)), closes [nuxt/framework#51](https://github.com/nuxt/framework/issues/51)
+
 ### [1.0.1](https://github.com/unjs/unctx/compare/v1.0.0...v1.0.1) (2021-06-24)
 
 ## [1.0.0](https://github.com/unjs/unctx/compare/v0.0.4...v1.0.0) (2021-06-24)
