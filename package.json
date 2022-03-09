@@ -23,17 +23,17 @@
     "lint": "eslint --ext .ts,.js .",
     "prepublishOnly": "yarn build",
     "release": "yarn test && standard-version && git push --follow-tags && npm publish",
-    "test": "yarn lint && yarn jest"
+    "test": "yarn lint && vitest --coverage"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
+    "c8": "^7.11.0",
     "eslint": "latest",
-    "jest": "latest",
     "siroc": "latest",
     "standard-version": "latest",
-    "ts-jest": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^0.6.0"
   }
 }
