@@ -29,11 +29,11 @@
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
-    "c8": "^7.11.0",
+    "c8": "latest",
     "eslint": "latest",
     "siroc": "latest",
     "standard-version": "latest",
     "typescript": "latest",
-    "vitest": "^0.6.0"
+    "vitest": "latest"
   }
 }
