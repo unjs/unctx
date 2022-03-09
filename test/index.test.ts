@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest'
 import { createContext, createNamespace } from '../src'
 
 describe('createContext', () => {
@@ -16,7 +17,7 @@ describe('createContext', () => {
     const ctx = createContext()
     expect(ctx.use()).toBe(null)
     ctx.call('A', () => {
-      expect(() => ctx.call('B', jest.fn())).toThrow('Context conflict')
+      expect(() => ctx.call('B', vi.fn())).toThrow('Context conflict')
     })
   })
 
