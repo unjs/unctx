@@ -25,6 +25,11 @@
     "release": "yarn test && standard-version && git push --follow-tags && npm publish",
     "test": "yarn lint && vitest --coverage"
   },
+  "dependencies": {
+    "acorn": "^8.7.0",
+    "estree-walker": "^3.0.1",
+    "magic-string": "^0.26.1"
+  },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/jest": "latest",
