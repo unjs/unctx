@@ -6,15 +6,14 @@ import type {
   Node, CallExpression,
   BlockStatement,
   AwaitExpression,
-  Position,
-  FunctionExpression
+  Position
 } from 'estree'
 
 export interface TransformerOptions {
   /**
    * The function names to be transformed.
    *
-   * @default ['withAsyncContext']
+   * @default ['withAsyncContext', 'callAsync']
    */
   triggerFunctions?: string[]
   /**
@@ -29,7 +28,7 @@ export interface TransformerOptions {
 
 export function createTransformer (options: TransformerOptions = {}) {
   const {
-    triggerFunctions: functions = ['withAsyncContext'],
+    triggerFunctions: functions = ['withAsyncContext', 'callAsync'],
     helperModule = 'unctx',
     helperName = 'excuteAsync'
   } = options
@@ -50,53 +49,60 @@ export function createTransformer (options: TransformerOptions = {}) {
     const s = new MagicString(code)
     const lines = code.split('\n')
 
+    let injectImport = false
+
     walk(ast, {
       enter (node: Node) {
         if (node.type === 'CallExpression') {
           if (node.callee.type === 'Identifier' && functions.includes(node.callee.name)) {
-            transformFunctionBody(node, node.callee.name)
+            transformFunctionBody(node)
           }
         }
       }
     })
 
+    if (injectImport) {
+      s.appendLeft(0, `import { ${helperName} as __excuteAsync } from "${helperModule}";`)
+    }
+
     function toIndex (pos: Position) {
       return lines.slice(0, pos.line - 1).join('\n').length + pos.column + 1
     }
 
-    function transformFunctionBody (node: CallExpression, name: string) {
-      const fn = node.arguments[0] as FunctionExpression
-      if (!fn || !['ArrowFunctionExpression', 'FunctionExpression'].includes(fn.type)) {
-        throw new Error(`Expect the first argument of '${name}' to be a function but got ${fn?.type}`)
-      }
-
-      // No need to transform non-async function
-      if (!fn.async) {
-        return
-      }
-
-      const body = fn.body as BlockStatement
-
-      let detected = false
-      walk(body, {
-        enter (node: Node, parent: Node | undefined) {
-          if (node.type === 'AwaitExpression') {
-            detected = true
-            injectForNode(node, parent)
-          }
-          // Skip transform for nested functions
-          if (node.type === 'ArrowFunctionExpression' || node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
-            return this.skip()
-          }
+    function transformFunctionBody (node: CallExpression) {
+      for (const fn of node.arguments) {
+        if (fn.type !== 'ArrowFunctionExpression' && fn.type !== 'FunctionExpression') {
+          continue
         }
-      })
 
-      if (detected) {
-        s.appendLeft(0, `import { ${helperName} as __excuteAsync } from "${helperModule}";`)
-        s.appendLeft(
-          toIndex(body.loc.start) + 1,
-          'let __temp, __restore;'
-        )
+        // No need to transform non-async function
+        if (!fn.async) {
+          continue
+        }
+
+        const body = fn.body as BlockStatement
+
+        let injectVariable = false
+        walk(body, {
+          enter (node: Node, parent: Node | undefined) {
+            if (node.type === 'AwaitExpression') {
+              injectImport = true
+              injectVariable = true
+              injectForNode(node, parent)
+            }
+            // Skip transform for nested functions
+            if (node.type === 'ArrowFunctionExpression' || node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
+              return this.skip()
+            }
+          }
+        })
+
+        if (injectVariable) {
+          s.appendLeft(
+            toIndex(body.loc.start) + 1,
+            'let __temp, __restore;'
+          )
+        }
       }
     }
 
@@ -112,8 +118,8 @@ export function createTransformer (options: TransformerOptions = {}) {
         toIndex(node.loc.start),
         toIndex(node.loc.end),
         isStatement
-          ? `;(([__temp,__restore]=__excuteAsync(()=>${body})),await __temp,__restore);`
-          : `(([__temp,__restore]=__excuteAsync(()=>${body})),__temp=await __temp,__restore,__temp)`
+          ? `;(([__temp,__restore]=__excuteAsync(()=>${body})),await __temp,__restore());`
+          : `(([__temp,__restore]=__excuteAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
       )
     }
 
