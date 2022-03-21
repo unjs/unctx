@@ -49,20 +49,35 @@ export function createTransformer (options: TransformerOptions = {}) {
     const s = new MagicString(code)
     const lines = code.split('\n')
 
-    let injectImport = false
+    let detected = false
 
     walk(ast, {
       enter (node: Node) {
         if (node.type === 'CallExpression') {
-          if (node.callee.type === 'Identifier' && functions.includes(node.callee.name)) {
+          if (functions.includes(getFunctionName(node.callee))) {
             transformFunctionBody(node)
           }
         }
       }
     })
 
-    if (injectImport) {
-      s.appendLeft(0, `import { ${helperName} as __excuteAsync } from "${helperModule}";`)
+    if (!detected) {
+      return null
+    }
+
+    s.appendLeft(0, `import { ${helperName} as __excuteAsync } from "${helperModule}";`)
+
+    return {
+      code: s.toString(),
+      magicString: s
+    }
+
+    function getFunctionName (node: Node) {
+      if (node.type === 'Identifier') {
+        return node.name
+      } else if (node.type === 'MemberExpression') {
+        return getFunctionName(node.property)
+      }
     }
 
     function toIndex (pos: Position) {
@@ -86,7 +101,7 @@ export function createTransformer (options: TransformerOptions = {}) {
         walk(body, {
           enter (node: Node, parent: Node | undefined) {
             if (node.type === 'AwaitExpression') {
-              injectImport = true
+              detected = true
               injectVariable = true
               injectForNode(node, parent)
             }
@@ -121,11 +136,6 @@ export function createTransformer (options: TransformerOptions = {}) {
           ? `;(([__temp,__restore]=__excuteAsync(()=>${body})),await __temp,__restore());`
           : `(([__temp,__restore]=__excuteAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
       )
-    }
-
-    return {
-      code: s.toString(),
-      magicString: s
     }
   }
 

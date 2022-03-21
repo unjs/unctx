@@ -71,18 +71,46 @@ describe('transforms', () => {
     `)
   })
 
+  it('transforms dot usage', () => {
+    expect(transform(`
+      export default ctx.callAsync(async () => {
+        const ctx1 = useSomething()
+        await something()
+        const ctx2 = useSomething()
+      })
+    `)).toMatchInlineSnapshot(`
+      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      export default ctx.callAsync(async () => {let __temp, __restore;
+        const ctx1 = useSomething()
+        ;(([__temp,__restore]=__excuteAsync(()=>something())),await __temp,__restore());
+        const ctx2 = useSomething()
+      })
+      "
+    `)
+
+    expect(transform(`
+      export default x.ctx.callAsync(async () => {
+        const ctx1 = useSomething()
+        await something()
+        const ctx2 = useSomething()
+      })
+    `)).toMatchInlineSnapshot(`
+      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      export default x.ctx.callAsync(async () => {let __temp, __restore;
+        const ctx1 = useSomething()
+        ;(([__temp,__restore]=__excuteAsync(()=>something())),await __temp,__restore());
+        const ctx2 = useSomething()
+      })
+      "
+    `)
+  })
+
   it('does not transform non async usage', () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         const ctx = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
-      "
-      export default withAsyncContext(async () => {
-        const ctx = useSomething()
-      })
-      "
-    `)
+    `)).toBeUndefined()
   })
 
   it('does not transform nested functions', () => {
@@ -96,18 +124,16 @@ describe('transforms', () => {
         }
         const ctx = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
-      "
-      export default withAsyncContext(async () => {
-        async function foo() {
-          await something()
-        }
-        const bar = async () => {
-          await something()
-        }
-        const ctx = useSomething()
+    `)).toBeUndefined()
+  })
+
+  it('does not transform non target function', () => {
+    expect(transform(`
+      export default someFunction(async () => {
+        const ctx1 = useSomething()
+        await something()
+        const ctx2 = useSomething()
       })
-      "
-    `)
+    `)).toBeUndefined()
   })
 })

@@ -8,22 +8,26 @@ describe('callAsync', () => {
     const ctx = createContext()
     expect(ctx.use()).toBe(null)
 
-    const { callAsync } = ctx
     const res = await Promise.all([
-      callAsync('A', async () => {
+      ctx.callAsync('A', async () => {
         expect(ctx.use()).toBe('A')
         await sleep(1)
         expect(ctx.use()).toBe('A')
-        return 'A'
+        return ctx.use()
       }),
-      callAsync('B', async () => {
+      ctx.callAsync('B', async () => {
         expect(ctx.use()).toBe('B')
         await sleep(1)
         expect(ctx.use()).toBe('B')
-        return 'B'
+        return ctx.use()
+      }),
+      ctx.callAsync('C', async () => {
+        await sleep(5)
+        expect(ctx.use()).toBe('C')
+        return ctx.use()
       })
     ])
 
-    expect(res).toEqual(['A', 'B'])
+    expect(res).toEqual(['A', 'B', 'C'])
   })
 })
