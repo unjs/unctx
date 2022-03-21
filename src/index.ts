@@ -35,16 +35,11 @@ export function createContext<T = any> (): UseContext<T> {
       checkConflict(instance)
       currentInstance = instance
       try {
-        const res = cb()
+        return cb()
+      } finally {
         if (!isSingleton) {
           currentInstance = null
         }
-        return res
-      } catch (err) {
-        if (!isSingleton) {
-          currentInstance = null
-        }
-        throw err
       }
     },
     async callAsync (instance: T, cb) {
@@ -59,17 +54,11 @@ export function createContext<T = any> (): UseContext<T> {
       }
       asyncHandlers.add(handler)
       try {
-        const res = await cb()
-        if (!isSingleton) {
-          currentInstance = prev
-        }
-        return res
-      } catch (err) {
-        if (!isSingleton) {
-          currentInstance = prev
-        }
-        throw err
+        return await cb()
       } finally {
+        if (!isSingleton) {
+          currentInstance = prev
+        }
         asyncHandlers.delete(handler)
       }
     }
