@@ -30,4 +30,14 @@ describe('callAsync', () => {
 
     expect(res).toEqual(['A', 'B', 'C'])
   })
+
+  it('non transformed situation', async () => {
+    const ctx = createContext()
+    const nonTransformedCall = ctx['call' + 'Async']
+    await nonTransformedCall('A', async () => {
+      expect(ctx.use()).toBe('A')
+      await sleep(1)
+      expect(ctx.use()).toBe('A')
+    })
+  })
 })

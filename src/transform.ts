@@ -21,19 +21,20 @@ export interface TransformerOptions {
    */
   helperModule?: string
   /**
-   * @default 'excuteAsync'
+   * @default 'executeAsync'
    */
   helperName?: string
 }
 
 export function createTransformer (options: TransformerOptions = {}) {
-  const {
-    triggerFunctions: functions = ['withAsyncContext', 'callAsync'],
-    helperModule = 'unctx',
-    helperName = 'excuteAsync'
-  } = options
+  options = {
+    triggerFunctions: ['withAsyncContext', 'callAsync'],
+    helperModule: 'unctx',
+    helperName: 'executeAsync',
+    ...options
+  }
 
-  const matchRE = new RegExp(`\\b(${functions.join('|')})\\(`)
+  const matchRE = new RegExp(`\\b(${options.triggerFunctions.join('|')})\\(`)
 
   function shouldTransform (code: string) {
     return matchRE.test(code)
@@ -54,7 +55,7 @@ export function createTransformer (options: TransformerOptions = {}) {
     walk(ast, {
       enter (node: Node) {
         if (node.type === 'CallExpression') {
-          if (functions.includes(getFunctionName(node.callee))) {
+          if (options.triggerFunctions.includes(getFunctionName(node.callee))) {
             transformFunctionBody(node)
           }
         }
@@ -65,7 +66,7 @@ export function createTransformer (options: TransformerOptions = {}) {
       return null
     }
 
-    s.appendLeft(0, `import { ${helperName} as __excuteAsync } from "${helperModule}";`)
+    s.appendLeft(0, `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`)
 
     return {
       code: s.toString(),
@@ -133,8 +134,8 @@ export function createTransformer (options: TransformerOptions = {}) {
         toIndex(node.loc.start),
         toIndex(node.loc.end),
         isStatement
-          ? `;(([__temp,__restore]=__excuteAsync(()=>${body})),await __temp,__restore());`
-          : `(([__temp,__restore]=__excuteAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
+          ? `;(([__temp,__restore]=__executeAsync(()=>${body})),await __temp,__restore());`
+          : `(([__temp,__restore]=__executeAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
       )
     }
   }

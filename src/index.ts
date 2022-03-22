@@ -7,7 +7,7 @@ export interface UseContext<T> {
 }
 
 type OnAsyncRestore = () => void
-type OnAsyncLeave = () => undefined | OnAsyncRestore
+type OnAsyncLeave = () => void | OnAsyncRestore
 
 export function createContext<T = any> (): UseContext<T> {
   let currentInstance: T = null
@@ -45,21 +45,16 @@ export function createContext<T = any> (): UseContext<T> {
     async callAsync (instance: T, cb) {
       const prev = currentInstance
       currentInstance = instance
-      const handler: OnAsyncLeave = () => {
-        if (currentInstance === instance) {
-          return () => {
-            currentInstance = instance
-          }
-        }
-      }
-      asyncHandlers.add(handler)
+      const onRestore: OnAsyncRestore = () => { currentInstance = instance }
+      const onLeave: OnAsyncLeave = () => currentInstance === instance ? onRestore : undefined
+      asyncHandlers.add(onLeave)
       try {
         return await cb()
       } finally {
         if (!isSingleton) {
           currentInstance = prev
         }
-        asyncHandlers.delete(handler)
+        asyncHandlers.delete(onLeave)
       }
     }
   }
@@ -106,10 +101,24 @@ const asyncHandlersKey = '__unctx_async_handlers__'
 const asyncHandlers: Set<OnAsyncLeave> =
   _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = new Set())
 
-export const excuteAsync = <T>(fn: (() => Promise<T>)) => {
-  const restores = Array.from(asyncHandlers).map(i => i())
-  function restore () {
-    restores.forEach(i => i?.())
+type AsyncFn<T> = () => Promise<T>
+
+export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
+  const restores: OnAsyncRestore[] = []
+  for (const leaveHandler of asyncHandlers) {
+    const restore = leaveHandler()
+    if (restore) {
+      restores.push(restore)
+    }
+  }
+  const restore = () => {
+    for (const restore of restores) {
+      restore()
+    }
   }
   return [fn(), restore]
+}
+
+export function withAsyncContext<T=any> (fn: AsyncFn<T>): AsyncFn<T> {
+  return fn
 }

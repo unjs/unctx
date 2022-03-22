@@ -19,10 +19,10 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       })
     `)).toMatchInlineSnapshot(`
-      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         const ctx1 = useSomething()
-        ;(([__temp,__restore]=__excuteAsync(()=>something())),await __temp,__restore());
+        ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
         const ctx2 = useSomething()
       })
       "
@@ -37,10 +37,10 @@ describe('transforms', () => {
         const ctx = useSomething()
       })
     `)).toMatchInlineSnapshot(`
-      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
-        const foo = (([__temp,__restore]=__excuteAsync(()=>something())),__temp=await __temp,__restore(),__temp)
-        const bar = hello((([__temp,__restore]=__excuteAsync(()=>something())),__temp=await __temp,__restore(),__temp))
+        const foo = (([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp)
+        const bar = hello((([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp))
         const ctx = useSomething()
       })
       "
@@ -58,11 +58,11 @@ describe('transforms', () => {
         const ctx = useSomething()
       })
     `)).toMatchInlineSnapshot(`
-      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         for (const i of foo) {
           if (i) {
-            ;(([__temp,__restore]=__excuteAsync(()=>i())),await __temp,__restore());
+            ;(([__temp,__restore]=__executeAsync(()=>i())),await __temp,__restore());
           }
         }
         const ctx = useSomething()
@@ -79,10 +79,10 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       })
     `)).toMatchInlineSnapshot(`
-      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default ctx.callAsync(async () => {let __temp, __restore;
         const ctx1 = useSomething()
-        ;(([__temp,__restore]=__excuteAsync(()=>something())),await __temp,__restore());
+        ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
         const ctx2 = useSomething()
       })
       "
@@ -95,10 +95,10 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       })
     `)).toMatchInlineSnapshot(`
-      "import { excuteAsync as __excuteAsync } from \\"unctx\\";
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default x.ctx.callAsync(async () => {let __temp, __restore;
         const ctx1 = useSomething()
-        ;(([__temp,__restore]=__excuteAsync(()=>something())),await __temp,__restore());
+        ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
         const ctx2 = useSomething()
       })
       "
