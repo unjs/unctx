@@ -89,6 +89,68 @@ A generic type exists on all utilities to be set for instance/context type:
 const { use: useAwesome } = createContext<Awesome>()
 ```
 
+## Async Context
+
+Normally, using context is only possible before first await statement:
+
+```js
+async function setup() {
+  console.log(useAwesome()) // Returns context
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  console.log(useAwesome()) // Returns null
+}
+```
+
+A simple workaround, is caching context before first await and use it directly:
+
+```js
+async function setup() {
+  const ctx = useAwesome()
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  console.log(ctx) // We can directly access cached version of ctx
+}
+```
+
+However, this is not always as easy as making a variable when using nested composables.
+
+Unctx provides a better solution that transforms async to automatically restore context after each await call. This requires using a bundler such as Rollup, Vite or Webpack.
+
+Import and register transform plugin:
+
+```js
+import { unctxPlugin } from 'unctx/plugin'
+
+// Rollup
+// TODO: Add to rollup configuration
+unctxPlugin.rollup()
+
+// Vite
+// TODO: Add to vite configuration
+unctxPlugin.vite()
+
+// Webpack
+// TODO: Add to webpack configuration
+unctxPlugin.webpack()
+```
+
+Use `ctx.callAsync` instead of `ctx.call`:
+
+```js
+await ctx.callAsync('test', setup)
+```
+
+Any async function that requires context, should be wrapped with `withAsyncContext`:
+
+```js
+import { withAsyncContext } from 'unctx'
+
+const setup = withAsyncContext(async () => {
+  console.log(useAwesome()) // Returns context
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  console.log(useAwesome()) // Still returns context with dark magic!
+})
+```
+
 ## Under the hood
 
 Composition of functions is possible using temporary context injection. When calling `ctx.call(instance, cb)`, `instance` argument will be stored in a temporary variable then `cb` is called. Any function inside `cb`, can then implicitly access instance by using `ctx.use` (or `useAwesome`)
@@ -97,15 +159,7 @@ Composition of functions is possible using temporary context injection. When cal
 
 **context can be only used before first await**:
 
- To avoid leaking context, `call` method synchronously sets context and unset it as soon as possible. Because of this, `useAwesome` should happen before first `await` call and reused if necessary.
-
-```js
-async function setup() {
-  const awesome = useAwesome()
-  await someFunction()
-  // useAwesome() returns null here
-}
-```
+Please check Async context section.
 
 **`Context conflict` error**:
 

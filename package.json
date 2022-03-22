@@ -15,6 +15,11 @@
       "require": "./dist/transform.js",
       "import": "./dist/transform.mjs",
       "types": "./dist/transform.d.ts"
+    },
+    "./plugin": {
+      "require": "./dist/plugin.js",
+      "import": "./dist/plugin.mjs",
+      "types": "./dist/plugin.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -34,7 +39,8 @@
   "dependencies": {
     "acorn": "^8.7.0",
     "estree-walker": "^2.0.2",
-    "magic-string": "^0.26.1"
+    "magic-string": "^0.26.1",
+    "unplugin": "^0.5.2"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",

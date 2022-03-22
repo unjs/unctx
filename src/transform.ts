@@ -37,10 +37,13 @@ export function createTransformer (options: TransformerOptions = {}) {
   const matchRE = new RegExp(`\\b(${options.triggerFunctions.join('|')})\\(`)
 
   function shouldTransform (code: string) {
-    return matchRE.test(code)
+    return typeof code === 'string' && matchRE.test(code)
   }
 
-  function doTransform (code: string) {
+  function transform (code: string, opts: { force?: false } = {}) {
+    if (!opts.force && !shouldTransform(code)) {
+      return
+    }
     const ast = acorn.parse(code, {
       sourceType: 'module',
       ecmaVersion: 'latest',
@@ -140,16 +143,8 @@ export function createTransformer (options: TransformerOptions = {}) {
     }
   }
 
-  function transform (code: string) {
-    if (!shouldTransform(code)) {
-      return
-    }
-    return doTransform(code)
-  }
-
   return {
     transform,
-    doTransform,
     shouldTransform
   }
 }
