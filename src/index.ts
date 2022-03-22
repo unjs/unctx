@@ -119,6 +119,10 @@ export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
   return [fn(), restore]
 }
 
-export function withAsyncContext<T=any> (fn: AsyncFn<T>): AsyncFn<T> {
+export function withAsyncContext<T=any> (fn: AsyncFn<T>, transformed?: boolean): AsyncFn<T> {
+  if (!transformed) {
+    // eslint-disable-next-line no-console
+    console.warn('[unctx] `withAsyncContext` needs transformation for async context support in', fn, '\n', fn.toString())
+  }
   return fn
 }

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { createContext } from '../src'
+import { describe, it, expect, fn } from 'vitest'
+import { createContext, withAsyncContext } from '../src'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -31,7 +31,7 @@ describe('callAsync', () => {
     expect(res).toEqual(['A', 'B', 'C'])
   })
 
-  it('non transformed situation', async () => {
+  it('non transformed should unset context', async () => {
     const ctx = createContext()
     const _callAsync = ctx.callAsync // Skip transform
     await _callAsync('A', async () => {
@@ -39,5 +39,34 @@ describe('callAsync', () => {
       await sleep(1)
       expect(ctx.use()).toBe(null)
     })
+  })
+
+  it('withAsyncContext', async () => {
+    const ctx = createContext()
+    const _callAsync = ctx.callAsync // Skip transform
+    await _callAsync('A', withAsyncContext(async () => {
+      expect(ctx.use()).toBe('A')
+      await sleep(1)
+      expect(ctx.use()).toBe('A')
+    }))
+  })
+
+  it('withAsyncContext (not transformed)', async () => {
+    const ctx = createContext()
+    const _callAsync = ctx.callAsync // Skip transform
+    const _withAsyncContext = withAsyncContext
+    // eslint-disable-next-line no-console
+    const _warn = console.warn
+    // eslint-disable-next-line no-console
+    console.warn = fn()
+    await _callAsync('A', _withAsyncContext(async () => {
+      expect(ctx.use()).toBe('A')
+      await sleep(1)
+      expect(ctx.use()).toBe(null)
+    }))
+    // eslint-disable-next-line no-console
+    expect(console.warn).toHaveBeenCalledOnce()
+    // eslint-disable-next-line no-console
+    console.warn = _warn
   })
 })

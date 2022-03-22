@@ -58,8 +58,15 @@ export function createTransformer (options: TransformerOptions = {}) {
     walk(ast, {
       enter (node: Node) {
         if (node.type === 'CallExpression') {
-          if (options.asyncFunctions.includes(getFunctionName(node.callee))) {
+          const functionName = getFunctionName(node.callee)
+          if (options.asyncFunctions.includes(functionName)) {
             transformFunctionBody(node)
+            if (functionName !== 'callAsync') {
+              const lastArg = node.arguments[node.arguments.length - 1]
+              if (lastArg) {
+                s.appendRight(toIndex(lastArg.loc.end), ',1')
+              }
+            }
           }
         }
       }

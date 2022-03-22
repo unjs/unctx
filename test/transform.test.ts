@@ -24,7 +24,7 @@ describe('transforms', () => {
         const ctx1 = useSomething()
         ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
         const ctx2 = useSomething()
-      })
+      },1)
       "
     `)
   })
@@ -42,7 +42,7 @@ describe('transforms', () => {
         const foo = (([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp)
         const bar = hello((([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp))
         const ctx = useSomething()
-      })
+      },1)
       "
     `)
   })
@@ -66,7 +66,7 @@ describe('transforms', () => {
           }
         }
         const ctx = useSomething()
-      })
+      },1)
       "
     `)
   })
