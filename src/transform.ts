@@ -15,7 +15,7 @@ export interface TransformerOptions {
    *
    * @default ['withAsyncContext', 'callAsync']
    */
-  triggerFunctions?: string[]
+  asyncFunctions?: string[]
   /**
    * @default 'unctx'
    */
@@ -28,13 +28,13 @@ export interface TransformerOptions {
 
 export function createTransformer (options: TransformerOptions = {}) {
   options = {
-    triggerFunctions: ['withAsyncContext', 'callAsync'],
+    asyncFunctions: ['withAsyncContext', 'callAsync'].concat(options.asyncFunctions || []),
     helperModule: 'unctx',
     helperName: 'executeAsync',
     ...options
   }
 
-  const matchRE = new RegExp(`\\b(${options.triggerFunctions.join('|')})\\(`)
+  const matchRE = new RegExp(`\\b(${options.asyncFunctions.join('|')})\\(`)
 
   function shouldTransform (code: string) {
     return typeof code === 'string' && matchRE.test(code)
@@ -58,7 +58,7 @@ export function createTransformer (options: TransformerOptions = {}) {
     walk(ast, {
       enter (node: Node) {
         if (node.type === 'CallExpression') {
-          if (options.triggerFunctions.includes(getFunctionName(node.callee))) {
+          if (options.asyncFunctions.includes(getFunctionName(node.callee))) {
             transformFunctionBody(node)
           }
         }
