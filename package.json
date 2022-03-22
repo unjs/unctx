@@ -8,7 +8,18 @@
   "exports": {
     ".": {
       "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./transform": {
+      "require": "./dist/transform.js",
+      "import": "./dist/transform.mjs",
+      "types": "./dist/transform.d.ts"
+    },
+    "./plugin": {
+      "require": "./dist/plugin.js",
+      "import": "./dist/plugin.mjs",
+      "types": "./dist/plugin.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -19,11 +30,17 @@
   ],
   "scripts": {
     "build": "siroc build",
-    "dev": "jest --watch",
+    "stub": "siroc dev",
     "lint": "eslint --ext .ts,.js .",
     "prepublishOnly": "yarn build",
     "release": "yarn test && standard-version && git push --follow-tags && npm publish",
     "test": "yarn lint && vitest --coverage"
+  },
+  "dependencies": {
+    "acorn": "^8.7.0",
+    "estree-walker": "^2.0.2",
+    "magic-string": "^0.26.1",
+    "unplugin": "^0.5.2"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",

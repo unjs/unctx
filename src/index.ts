@@ -1,10 +1,13 @@
-
 export interface UseContext<T> {
   use: () => T | null
   set: (instance?: T, replace?: Boolean) => void
   unset: () => void
   call: <R>(instance: T, cb: () => R) => R
+  callAsync: <R>(instance: T, cb: () => R | Promise<R>) => Promise<R>
 }
+
+type OnAsyncRestore = () => void
+type OnAsyncLeave = () => void | OnAsyncRestore
 
 export function createContext<T = any> (): UseContext<T> {
   let currentInstance: T = null
@@ -15,7 +18,6 @@ export function createContext<T = any> (): UseContext<T> {
       throw new Error('Context conflict')
     }
   }
-
   return {
     use: () => currentInstance,
     set: (instance: T, replace?: Boolean) => {
@@ -33,16 +35,26 @@ export function createContext<T = any> (): UseContext<T> {
       checkConflict(instance)
       currentInstance = instance
       try {
-        const res = cb()
+        return cb()
+      } finally {
         if (!isSingleton) {
           currentInstance = null
         }
-        return res
-      } catch (err) {
+      }
+    },
+    async callAsync (instance: T, cb) {
+      currentInstance = instance
+      const onRestore: OnAsyncRestore = () => { currentInstance = instance }
+      const onLeave: OnAsyncLeave = () => currentInstance === instance ? onRestore : undefined
+      asyncHandlers.add(onLeave)
+      try {
+        const r = cb()
         if (!isSingleton) {
           currentInstance = null
         }
-        throw err
+        return await r
+      } finally {
+        asyncHandlers.delete(onLeave)
       }
     }
   }
@@ -84,3 +96,33 @@ export const defaultNamespace: ContextNamespace =
 export const getContext = <T>(key: string) => defaultNamespace.get<T>(key)
 
 export const useContext = <T>(key: string) => getContext<T>(key).use
+
+const asyncHandlersKey = '__unctx_async_handlers__'
+const asyncHandlers: Set<OnAsyncLeave> =
+  _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = new Set())
+
+type AsyncFn<T> = () => Promise<T>
+
+export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
+  const restores: OnAsyncRestore[] = []
+  for (const leaveHandler of asyncHandlers) {
+    const restore = leaveHandler()
+    if (restore) {
+      restores.push(restore)
+    }
+  }
+  const restore = () => {
+    for (const restore of restores) {
+      restore()
+    }
+  }
+  return [fn(), restore]
+}
+
+export function withAsyncContext<T=any> (fn: AsyncFn<T>, transformed?: boolean): AsyncFn<T> {
+  if (!transformed) {
+    // eslint-disable-next-line no-console
+    console.warn('[unctx] `withAsyncContext` needs transformation for async context support in', fn, '\n', fn.toString())
+  }
+  return fn
+}
