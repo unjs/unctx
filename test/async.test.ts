@@ -33,11 +33,11 @@ describe('callAsync', () => {
 
   it('non transformed situation', async () => {
     const ctx = createContext()
-    const nonTransformedCall = ctx['call' + 'Async']
-    await nonTransformedCall('A', async () => {
+    const _callAsync = ctx.callAsync // Skip transform
+    await _callAsync('A', async () => {
       expect(ctx.use()).toBe('A')
       await sleep(1)
-      expect(ctx.use()).toBe('A')
+      expect(ctx.use()).toBe(null)
     })
   })
 })

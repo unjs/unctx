@@ -43,17 +43,17 @@ export function createContext<T = any> (): UseContext<T> {
       }
     },
     async callAsync (instance: T, cb) {
-      const prev = currentInstance
       currentInstance = instance
       const onRestore: OnAsyncRestore = () => { currentInstance = instance }
       const onLeave: OnAsyncLeave = () => currentInstance === instance ? onRestore : undefined
       asyncHandlers.add(onLeave)
       try {
-        return await cb()
-      } finally {
+        const r = cb()
         if (!isSingleton) {
-          currentInstance = prev
+          currentInstance = null
         }
+        return await r
+      } finally {
         asyncHandlers.delete(onLeave)
       }
     }
