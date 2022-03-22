@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/unjs/unctx/compare/v1.0.2...v1.1.0) (2022-03-22)
+
+
+### Features
+
+* transfromer for async context support ([#4](https://github.com/unjs/unctx/issues/4)) ([bc4d17a](https://github.com/unjs/unctx/commit/bc4d17a753181bfa18697553eb96d390715cf6e2))
+
 ### [1.0.2](https://github.com/unjs/unctx/compare/v1.0.1...v1.0.2) (2021-08-24)
 
 
