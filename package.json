@@ -28,6 +28,14 @@
   "files": [
     "dist"
   ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/index.d.ts",
+        "./dist/*"
+      ]
+    }
+  },
   "scripts": {
     "build": "unbuild",
     "dev": "vitest",
