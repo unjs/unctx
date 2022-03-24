@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/unjs/unctx/compare/v1.1.0...v1.1.1) (2022-03-24)
+
+
+### Bug Fixes
+
+* submodule types ([4dfd0cd](https://github.com/unjs/unctx/commit/4dfd0cdd59c153ffd080b83c6922c2feec9e8dd6))
+
 ## [1.1.0](https://github.com/unjs/unctx/compare/v1.0.2...v1.1.0) (2022-03-22)
 
 
