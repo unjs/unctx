@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/unjs/unctx/compare/v1.1.2...v1.1.3) (2022-03-25)
+
+
+### Bug Fixes
+
+* **plugin:** generate map correctly ([d9350b7](https://github.com/unjs/unctx/commit/d9350b7421f15697945f2e68ecbd0e1da7e7abef))
+* **plugin:** webpack compatible ([b4572a4](https://github.com/unjs/unctx/commit/b4572a4ecb2ace00aead2a224fcc391a52efa4bb))
+* **transform:** allow overriding `createTransformer` ([7ef74ff](https://github.com/unjs/unctx/commit/7ef74ff06ac511dc44075f3fdcb3a47f566fa640))
+* **transform:** disable transforming `callAsync` by default ([#5](https://github.com/unjs/unctx/issues/5)) ([dc0fcfd](https://github.com/unjs/unctx/commit/dc0fcfdc21ca4b218f1924eb2408687ee6690477))
+
 ### [1.1.2](https://github.com/unjs/unctx/compare/v1.1.1...v1.1.2) (2022-03-24)
 
 
