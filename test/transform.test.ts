@@ -2,7 +2,9 @@ import { expect, it, describe } from 'vitest'
 import { createTransformer } from '../src/transform'
 
 describe('transforms', () => {
-  const transformer = createTransformer()
+  const transformer = createTransformer({
+    asyncFunctions: ['withAsyncContext', 'callAsync']
+  })
 
   function transform (input: string) {
     return transformer.transform(
