@@ -28,7 +28,7 @@ export interface TransformerOptions {
 
 export function createTransformer (options: TransformerOptions = {}) {
   options = {
-    asyncFunctions: ['withAsyncContext', 'callAsync'].concat(options.asyncFunctions || []),
+    asyncFunctions: ['withAsyncContext', 'callAsync'],
     helperModule: 'unctx',
     helperName: 'executeAsync',
     ...options
