@@ -11,12 +11,12 @@ export const unctxPlugin = createUnplugin((opts: UnctxPluginOptions = {}) => {
     name: 'unctx:transfrom',
     enforce: 'post',
     transformInclude: opts.transformInclude,
-    transform (code) {
+    transform (code, id) {
       const result = transformer.transform(code)
       if (result) {
         return {
           code: result.code,
-          map: result.magicString.generateMap()
+          map: result.magicString.generateMap({ source: id, includeContent: true })
         }
       }
     }
