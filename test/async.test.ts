@@ -6,7 +6,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 describe('callAsync', () => {
   it('call and use', async () => {
     const ctx = createContext()
-    expect(ctx.use()).toBe(null)
+    expect(ctx.tryUse()).toBe(null)
 
     const res = await Promise.all([
       ctx.callAsync('A', async () => {
@@ -35,9 +35,9 @@ describe('callAsync', () => {
     const ctx = createContext()
     const _callAsync = ctx.callAsync // Skip transform
     await _callAsync('A', async () => {
-      expect(ctx.use()).toBe('A')
+      expect(ctx.tryUse()).toBe('A')
       await sleep(1)
-      expect(ctx.use()).toBe(null)
+      expect(ctx.tryUse()).toBe(null)
     })
   })
 
@@ -62,7 +62,7 @@ describe('callAsync', () => {
     await _callAsync('A', _withAsyncContext(async () => {
       expect(ctx.use()).toBe('A')
       await sleep(1)
-      expect(ctx.use()).toBe(null)
+      expect(ctx.tryUse()).toBe(null)
     }))
     // eslint-disable-next-line no-console
     expect(console.warn).toHaveBeenCalledOnce()
