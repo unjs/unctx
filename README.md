@@ -47,6 +47,8 @@ function setup() {
 }
 ```
 
+**Note:** when no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
+
 ## Using Namespaces
 
 To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
@@ -80,7 +82,7 @@ ctx.set(new Awesome())
 export const useAwesome = ctx.use
 ```
 
-## Typescript
+## TypeScript
 
 A generic type exists on all utilities to be set for instance/context type:
 

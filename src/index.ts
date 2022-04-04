@@ -1,8 +1,28 @@
 export interface UseContext<T> {
-  use: () => T | null
+  /**
+   * Get the current context. Throws if no context is set.
+   */
+  use: () => T
+  /**
+   * Get the current context. Returns `null` when no context is set.
+   */
+  tryUse: () => T | null
+  /**
+   * Set the context as Singleton Pattern.
+   */
   set: (instance?: T, replace?: Boolean) => void
+  /**
+   * Clear current context.
+   */
   unset: () => void
+  /**
+   * Exclude a synchronous function with the provided context.
+   */
   call: <R>(instance: T, cb: () => R) => R
+  /**
+   * Exclude an asynchronous function with the provided context.
+   * Requires installing the transform plugin to work properly.
+   */
   callAsync: <R>(instance: T, cb: () => R | Promise<R>) => Promise<R>
 }
 
@@ -18,8 +38,17 @@ export function createContext<T = any> (): UseContext<T> {
       throw new Error('Context conflict')
     }
   }
+
   return {
-    use: () => currentInstance,
+    use: () => {
+      if (currentInstance == null) {
+        throw new Error('Context is not available')
+      }
+      return currentInstance
+    },
+    tryUse: () => {
+      return currentInstance
+    },
     set: (instance: T, replace?: Boolean) => {
       if (!replace) {
         checkConflict(instance)
