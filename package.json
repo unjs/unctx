@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "acorn": "^8.7.0",
-    "estree-walker": "^2.0.2",
+    "estree-walker": "^3.0.1",
     "magic-string": "^0.26.1",
     "unplugin": "^0.6.1"
   },
