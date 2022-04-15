@@ -48,7 +48,7 @@
     "acorn": "^8.7.0",
     "estree-walker": "^2.0.2",
     "magic-string": "^0.26.1",
-    "unplugin": "^0.6.1"
+    "unplugin": "^0.6.2"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
@@ -61,5 +61,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@6.32.3"
+  "packageManager": "pnpm@6.32.7"
 }
