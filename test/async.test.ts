@@ -1,4 +1,4 @@
-import { describe, it, expect, fn } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { createContext, withAsyncContext } from '../src'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -58,7 +58,7 @@ describe('callAsync', () => {
     // eslint-disable-next-line no-console
     const _warn = console.warn
     // eslint-disable-next-line no-console
-    console.warn = fn()
+    console.warn = vi.fn()
     await _callAsync('A', _withAsyncContext(async () => {
       expect(ctx.use()).toBe('A')
       await sleep(1)
