@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "latest",
+    "@types/estree": "latest",
     "@types/jest": "latest",
     "@types/node": "latest",
     "c8": "latest",
@@ -61,5 +62,5 @@
     "unbuild": "latest",
     "vitest": "latest"
   },
-  "packageManager": "pnpm@6.32.12"
+  "packageManager": "pnpm@7.0.1"
 }
