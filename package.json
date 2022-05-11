@@ -47,7 +47,7 @@
   "dependencies": {
     "acorn": "^8.7.1",
     "estree-walker": "^2.0.2",
-    "magic-string": "^0.26.1",
+    "magic-string": "^0.26.2",
     "unplugin": "^0.6.3"
   },
   "devDependencies": {
