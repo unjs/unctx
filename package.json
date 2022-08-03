@@ -17,7 +17,6 @@
       "types": "./dist/transform.d.ts"
     },
     "./plugin": {
-      "require": "./dist/plugin.cjs",
       "import": "./dist/plugin.mjs",
       "types": "./dist/plugin.d.ts"
     }
