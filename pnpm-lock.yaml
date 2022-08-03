@@ -9,6 +9,7 @@ specifiers:
   c8: latest
   eslint: latest
   estree-walker: ^3.0.1
+  jiti: ^1.14.0
   magic-string: ^0.26.2
   standard-version: latest
   typescript: latest
@@ -29,6 +30,7 @@ devDependencies:
   '@types/node': 18.6.3
   c8: 7.12.0
   eslint: 8.21.0
+  jiti: 1.14.0
   standard-version: 9.5.0
   typescript: 4.7.4
   unbuild: 0.7.6

@@ -57,6 +57,7 @@
     "@types/node": "latest",
     "c8": "latest",
     "eslint": "latest",
+    "jiti": "^1.14.0",
     "standard-version": "latest",
     "typescript": "latest",
     "unbuild": "latest",
