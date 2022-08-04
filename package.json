@@ -12,7 +12,6 @@
       "types": "./dist/index.d.ts"
     },
     "./transform": {
-      "require": "./dist/transform.cjs",
       "import": "./dist/transform.mjs",
       "types": "./dist/transform.d.ts"
     },
