@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/unjs/unctx/compare/v1.1.4...v1.2.0) (2022-08-04)
+
+
+### Features
+
+* provide `tryUse` for forward compatibility with v2 ([3e48f5a](https://github.com/unjs/unctx/commit/3e48f5abe8b9646c47830725fbec68eea5e8f797))
+
 ### [1.1.4](https://github.com/unjs/unctx/compare/v1.1.3...v1.1.4) (2022-03-31)
 
 ### [1.1.3](https://github.com/unjs/unctx/compare/v1.1.2...v1.1.3) (2022-03-25)
