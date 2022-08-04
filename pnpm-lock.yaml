@@ -14,14 +14,14 @@ specifiers:
   standard-version: latest
   typescript: latest
   unbuild: latest
-  unplugin: ^0.8.0
+  unplugin: ^0.8.1
   vitest: latest
 
 dependencies:
   acorn: 8.8.0
   estree-walker: 3.0.1
   magic-string: 0.26.2
-  unplugin: 0.8.0
+  unplugin: 0.8.1
 
 devDependencies:
   '@nuxtjs/eslint-config-typescript': 10.0.0_qugx7qdu5zevzvxaiqyxfiwquq
@@ -3680,8 +3680,8 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
-  /unplugin/0.8.0:
-    resolution: {integrity: sha512-OzOkJ9XOPlD1Cph6qy/p4i/KSUbs76GToXjH/STHpfo6D7y+EqpfAL6G6HaoOw5QLkt9+KWwcxYUmPFkDf1upQ==}
+  /unplugin/0.8.1:
+    resolution: {integrity: sha512-o7rUZoPLG1fH4LKinWgb77gDtTE6mw/iry0Pq0Z5UPvZ9+HZ1/4+7fic7t58s8/CGkPrDpGq+RltO+DmswcR4g==}
     peerDependencies:
       esbuild: '>=0.13'
       rollup: ^2.50.0
