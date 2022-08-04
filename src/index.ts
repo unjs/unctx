@@ -1,5 +1,6 @@
 export interface UseContext<T> {
   use: () => T | null
+  tryUse: () => T | null
   set: (instance?: T, replace?: Boolean) => void
   unset: () => void
   call: <R>(instance: T, cb: () => R) => R
@@ -20,6 +21,7 @@ export function createContext<T = any> (): UseContext<T> {
   }
   return {
     use: () => currentInstance,
+    tryUse: () => currentInstance,
     set: (instance: T, replace?: Boolean) => {
       if (!replace) {
         checkConflict(instance)
