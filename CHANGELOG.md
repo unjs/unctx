@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/unjs/unctx/compare/v2.0.0...v2.0.1) (2022-08-04)
+
+
+### Bug Fixes
+
+* **pkg:** `/transform` subpath is also esm-only ([b7f63fc](https://github.com/unjs/unctx/commit/b7f63fcb8071f82249e3da7aec16350704a3bffc)), closes [#25](https://github.com/unjs/unctx/issues/25)
+
 ## [2.0.0](https://github.com/unjs/unctx/compare/v1.1.4...v2.0.0) (2022-08-03)
 
 
