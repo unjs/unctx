@@ -15,20 +15,20 @@ specifiers:
   standard-version: latest
   typescript: latest
   unbuild: latest
-  unplugin: ^0.9.4
+  unplugin: ^0.9.5
   vitest: latest
 
 dependencies:
   acorn: 8.8.0
   estree-walker: 3.0.1
   magic-string: 0.26.2
-  unplugin: 0.9.4
+  unplugin: 0.9.5
 
 devDependencies:
   '@nuxtjs/eslint-config-typescript': 10.0.0_4rv7y5c6xz3vfxwhbrcxxi73bq
   '@types/estree': 1.0.0
-  '@types/jest': 28.1.7
-  '@types/node': 18.7.8
+  '@types/jest': 28.1.8
+  '@types/node': 18.7.13
   '@vitest/coverage-c8': 0.22.1
   c8: 7.12.0
   eslint: 8.22.0
@@ -325,7 +325,7 @@ packages:
       '@jest/schemas': 28.1.3
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 18.7.8
+      '@types/node': 18.7.13
       '@types/yargs': 17.0.11
       chalk: 4.1.2
     dev: true
@@ -536,8 +536,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/28.1.7:
-    resolution: {integrity: sha512-acDN4VHD40V24tgu0iC44jchXavRNVFXQ/E6Z5XNsswgoSO/4NgsXoEYmPUGookKldlZQyIpmrEXsHI9cA3ZTA==}
+  /@types/jest/28.1.8:
+    resolution: {integrity: sha512-8TJkV++s7B6XqnDrzR1m/TT0A0h948Pnl/097veySPN67VRAgQ4gZ7n2KfJo2rVq6njQjdxU3GCCyDvAeuHoiw==}
     dependencies:
       expect: 28.1.3
       pretty-format: 28.1.3
@@ -555,8 +555,8 @@ packages:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
 
-  /@types/node/18.7.8:
-    resolution: {integrity: sha512-/YP55EMK2341JkODUb8DM9O0x1SIz2aBvyF33Uf1c76St3VpsMXEIW0nxuKkq/5cxnbz0RD9cfwNZHEAZQD3ag==}
+  /@types/node/18.7.13:
+    resolution: {integrity: sha512-46yIhxSe5xEaJZXWdIBP7GU4HDTG8/eo0qd9atdiL+lFpA03y8KS+lkTN834TWJj5767GbWv4n/P6efyTFt1Dw==}
     dev: true
 
   /@types/normalize-package-data/2.4.1:
@@ -566,7 +566,7 @@ packages:
   /@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
     dependencies:
-      '@types/node': 18.7.8
+      '@types/node': 18.7.13
     dev: true
 
   /@types/stack-utils/2.0.1:
@@ -1043,7 +1043,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
   /concat-stream/2.0.0:
@@ -2835,7 +2835,7 @@ packages:
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
     dependencies:
       '@jest/types': 28.1.3
-      '@types/node': 18.7.8
+      '@types/node': 18.7.13
       chalk: 4.1.2
       ci-info: 3.3.0
       graceful-fs: 4.2.9
@@ -4040,8 +4040,8 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
-  /unplugin/0.9.4:
-    resolution: {integrity: sha512-lUe769wSsZiltVA1Ns9ZRx3K1ri/4yzOrLLI/ebSAj2f0PsXqIJeHIXhkhiayEe1pv+mHuZYyBS3B2RXG2Q2EQ==}
+  /unplugin/0.9.5:
+    resolution: {integrity: sha512-luraheyfxwtvkvHpsOvMNv7IjLdORTWKZp0gWYNHGLi2ImON3iIZOj464qEyyEwLA/EMt12fC415HW9zRpOfTg==}
     peerDependencies:
       esbuild: '>=0.13'
       rollup: ^2.50.0
@@ -4155,7 +4155,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.3
       '@types/chai-subset': 1.3.3
-      '@types/node': 18.7.8
+      '@types/node': 18.7.13
       chai: 4.3.6
       debug: 4.3.4
       local-pkg: 0.4.2
