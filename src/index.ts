@@ -145,7 +145,11 @@ export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
       restore()
     }
   }
-  return [Promise.resolve(fn()).finally(restore), restore]
+  let promise = fn()
+  if ('finally' in promise) {
+    promise = promise.finally(restore)
+  }
+  return [promise, restore]
 }
 
 export function withAsyncContext<T=any> (fn: AsyncFn<T>, transformed?: boolean): AsyncFn<T> {
