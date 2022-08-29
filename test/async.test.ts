@@ -51,6 +51,22 @@ describe('callAsync', () => {
     }))
   })
 
+  it('withAsyncContext + try/catch', async () => {
+    const ctx = createContext()
+    const _callAsync = ctx.callAsync // Skip transform
+    const promise = async () => {
+      await sleep(1)
+      throw new Error('error')
+    }
+    await _callAsync('A', withAsyncContext(async () => {
+      expect(ctx.use()).toBe('A')
+      try {
+        await promise()
+      } catch {}
+      expect(ctx.use()).toBe('A')
+    }))
+  })
+
   it('withAsyncContext (not transformed)', async () => {
     const ctx = createContext()
     const _callAsync = ctx.callAsync // Skip transform
