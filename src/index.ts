@@ -132,7 +132,7 @@ const asyncHandlers: Set<OnAsyncLeave> =
 
 type AsyncFn<T> = () => Promise<T>
 
-export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
+export function executeAsync<T> (fn: AsyncFn<T>): Promise<T> {
   const restores: OnAsyncRestore[] = []
   for (const leaveHandler of asyncHandlers) {
     const restore = leaveHandler()
@@ -145,7 +145,7 @@ export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
       restore()
     }
   }
-  return [Promise.resolve(fn()).finally(restore), restore]
+  return Promise.resolve(fn()).finally(restore)
 }
 
 export function withAsyncContext<T=any> (fn: AsyncFn<T>, transformed?: boolean): AsyncFn<T> {

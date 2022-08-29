@@ -108,13 +108,11 @@ export function createTransformer (options: TransformerOptions = {}) {
 
         const body = fn.body as BlockStatement
 
-        let injectVariable = false
         walk(body, {
-          enter (node: Node, parent: Node | undefined) {
+          enter (node: Node) {
             if (node.type === 'AwaitExpression') {
               detected = true
-              injectVariable = true
-              injectForNode(node, parent)
+              injectForNode(node)
             }
             // Skip transform for nested functions
             if (node.type === 'ArrowFunctionExpression' || node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
@@ -122,30 +120,19 @@ export function createTransformer (options: TransformerOptions = {}) {
             }
           }
         })
-
-        if (injectVariable) {
-          s.appendLeft(
-            toIndex(body.loc.start) + 1,
-            'let __temp, __restore;'
-          )
-        }
       }
     }
 
-    function injectForNode (node: AwaitExpression, parent: Node | undefined) {
+    function injectForNode (node: AwaitExpression) {
       const body = code.slice(
         toIndex(node.argument.loc.start),
         toIndex(node.argument.loc.end)
       )
 
-      const isStatement = parent?.type === 'ExpressionStatement'
-
       s.overwrite(
         toIndex(node.loc.start),
         toIndex(node.loc.end),
-        isStatement
-          ? `;(([__temp,__restore]=__executeAsync(()=>${body})),await __temp,__restore());`
-          : `(([__temp,__restore]=__executeAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
+        `await __executeAsync(()=>${body})`
       )
     }
   }
