@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/unjs/unctx/compare/v2.0.1...v2.0.2) (2022-08-29)
+
+
+### Bug Fixes
+
+* reset async context on errors ([#28](https://github.com/unjs/unctx/issues/28)) ([e8116b1](https://github.com/unjs/unctx/commit/e8116b18c2855398f1ad850ba02395b3fb0337e3))
+
 ### [2.0.1](https://github.com/unjs/unctx/compare/v2.0.0...v2.0.1) (2022-08-04)
 
 
