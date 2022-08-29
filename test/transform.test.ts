@@ -73,6 +73,38 @@ describe('transforms', () => {
     `)
   })
 
+  it('transforms await in try-catch', () => {
+    expect(transform(`
+      export default withAsyncContext(async () => {
+        let user;
+
+        try {
+          user = await fetchUser();
+        } catch (e) {
+          user = null;
+        }
+      
+        if (!user)
+          return navigateTo('/');
+      })
+    `)).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default withAsyncContext(async () => {let __temp, __restore;
+        let user;
+
+        try {
+          user = (([__temp,__restore]=__executeAsync(()=>fetchUser())),__temp=await __temp,__restore(),__temp);
+        } catch (e) {
+          user = null;
+        }
+
+        if (!user)
+          return navigateTo('/');
+      },1)
+      "
+    `)
+  })
+
   it('transforms dot usage', () => {
     expect(transform(`
       export default ctx.callAsync(async () => {
