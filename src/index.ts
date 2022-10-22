@@ -93,15 +93,15 @@ export interface ContextNamespace {
   get: <T>(key: string) => UseContext<T>
 }
 
-export function createNamespace () {
-  const contexts: Record<string, UseContext<any>> = {}
+export function createNamespace<T = any> () {
+  const contexts: Record<string, UseContext<T>> = {}
 
   return {
     get (key) {
       if (!contexts[key]) {
         contexts[key] = createContext()
       }
-      contexts[key] as UseContext<any>
+      contexts[key] as UseContext<T>
       return contexts[key]
     }
   }
