@@ -4,7 +4,7 @@ specifiers:
   '@types/estree': ^1.0.0
   '@types/jest': ^29.2.2
   '@types/node': ^18.11.9
-  '@vitest/coverage-c8': ^0.25.1
+  '@vitest/coverage-c8': ^0.25.2
   acorn: ^8.8.1
   eslint: ^8.27.0
   eslint-config-unjs: ^0.0.2
@@ -14,27 +14,27 @@ specifiers:
   standard-version: ^9.5.0
   typescript: ^4.8.4
   unbuild: ^0.9.4
-  unplugin: ^0.10.2
-  vitest: ^0.25.1
+  unplugin: ^1.0.0
+  vitest: ^0.25.2
 
 dependencies:
   acorn: 8.8.1
   estree-walker: 3.0.1
   magic-string: 0.26.7
-  unplugin: 0.10.2
+  unplugin: 1.0.0
 
 devDependencies:
   '@types/estree': 1.0.0
   '@types/jest': 29.2.2
   '@types/node': 18.11.9
-  '@vitest/coverage-c8': 0.25.1
+  '@vitest/coverage-c8': 0.25.2
   eslint: 8.27.0
   eslint-config-unjs: 0.0.2_rmayb2veg2btbq6mbmnyivgasy
   jiti: 1.16.0
   standard-version: 9.5.0
   typescript: 4.8.4
   unbuild: 0.9.4
-  vitest: 0.25.1
+  vitest: 0.25.2
 
 packages:
 
@@ -703,11 +703,11 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.25.1:
-    resolution: {integrity: sha512-gpl5QNaNeIN0mfRiosCqBFoZcizb5GA458TDnOQXkGDc4kklazxn70u9evGfV62wiiAUfGGebgRhxlBkAa6m6g==}
+  /@vitest/coverage-c8/0.25.2:
+    resolution: {integrity: sha512-qKsiUJh3bjbB5Q229CbxEWCqiDBwvIrcZ9OOuQdMEC0pce3/LlTUK3+K3hd7WqAYEbbiqXfC5MVMKHZkV82PgA==}
     dependencies:
       c8: 7.12.0
-      vitest: 0.25.1
+      vitest: 0.25.2
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -4112,13 +4112,13 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: true
 
-  /unplugin/0.10.2:
-    resolution: {integrity: sha512-6rk7GUa4ICYjae5PrAllvcDeuT8pA9+j5J5EkxbMFaV+SalHhxZ7X2dohMzu6C3XzsMT+6jwR/+pwPNR3uK9MA==}
+  /unplugin/1.0.0:
+    resolution: {integrity: sha512-H5UnBUxfhTXBXGo2AwKsl0UaLSHzSNDZNehPQSgdhVfO/t+XAS1Yoj3vmLrrlBrS9ZwtH5tejbX/TCp5DcyCKg==}
     dependencies:
       acorn: 8.8.1
       chokidar: 3.5.3
       webpack-sources: 3.2.3
-      webpack-virtual-modules: 0.4.5
+      webpack-virtual-modules: 0.4.6
     dev: false
 
   /untyped/0.5.0:
@@ -4196,8 +4196,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.25.1:
-    resolution: {integrity: sha512-eH74h6MkuEgsqR4mAQZeMK9O0PROiKY+i+1GMz/fBi5A3L2ml5U7JQs7LfPU7+uWUziZyLHagl+rkyfR8SLhlA==}
+  /vitest/0.25.2:
+    resolution: {integrity: sha512-qqkzfzglEFbQY7IGkgSJkdOhoqHjwAao/OrphnHboeYHC5JzsVFoLCaB2lnAy8krhj7sbrFTVRApzpkTOeuDWQ==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -4245,8 +4245,8 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: false
 
-  /webpack-virtual-modules/0.4.5:
-    resolution: {integrity: sha512-8bWq0Iluiv9lVf9YaqWQ9+liNgXSHICm+rg544yRgGYaR8yXZTVBaHZkINZSB2yZSWo4b0F6MIxqJezVfOEAlg==}
+  /webpack-virtual-modules/0.4.6:
+    resolution: {integrity: sha512-5tyDlKLqPfMqjT3Q9TAqf2YqjwmnUleZwzJi1A5qXnlBCdj2AtOJ6wAWdglTIDOPgOiOrXeBeFcsQ8+aGQ6QbA==}
     dev: false
 
   /which-boxed-primitive/1.0.2:
