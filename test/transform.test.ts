@@ -1,19 +1,19 @@
-import { expect, it, describe } from 'vitest'
-import { createTransformer } from '../src/transform'
+import { expect, it, describe } from "vitest";
+import { createTransformer } from "../src/transform";
 
-describe('transforms', () => {
+describe("transforms", () => {
   const transformer = createTransformer({
-    asyncFunctions: ['withAsyncContext', 'callAsync']
-  })
+    asyncFunctions: ["withAsyncContext", "callAsync"]
+  });
 
   function transform (input: string) {
     return transformer.transform(
       // Slice 6 spaces indention for snapshot alignment
-      input.split('\n').map(i => i.slice(6)).join('\n')
-    )?.code
+      input.split("\n").map(index => index.slice(6)).join("\n")
+    )?.code;
   }
 
-  it('transforms', () => {
+  it("transforms", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         const ctx1 = useSomething()
@@ -28,10 +28,10 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       },1)
       "
-    `)
-  })
+    `);
+  });
 
-  it('transforms await as variable', () => {
+  it("transforms await as variable", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         const foo = await something()
@@ -46,10 +46,10 @@ describe('transforms', () => {
         const ctx = useSomething()
       },1)
       "
-    `)
-  })
+    `);
+  });
 
-  it('transforms await in nested scopes', () => {
+  it("transforms await in nested scopes", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         for (const i of foo) {
@@ -70,10 +70,10 @@ describe('transforms', () => {
         const ctx = useSomething()
       },1)
       "
-    `)
-  })
+    `);
+  });
 
-  it('transforms await in try-catch', () => {
+  it("transforms await in try-catch", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         let user;
@@ -102,10 +102,10 @@ describe('transforms', () => {
           return navigateTo('/');
       },1)
       "
-    `)
-  })
+    `);
+  });
 
-  it('transforms dot usage', () => {
+  it("transforms dot usage", () => {
     expect(transform(`
       export default ctx.callAsync(async () => {
         const ctx1 = useSomething()
@@ -120,7 +120,7 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       })
       "
-    `)
+    `);
 
     expect(transform(`
       export default x.ctx.callAsync(async () => {
@@ -136,18 +136,18 @@ describe('transforms', () => {
         const ctx2 = useSomething()
       })
       "
-    `)
-  })
+    `);
+  });
 
-  it('does not transform non async usage', () => {
+  it("does not transform non async usage", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         const ctx = useSomething()
       })
-    `)).toBeUndefined()
-  })
+    `)).toBeUndefined();
+  });
 
-  it('does not transform nested functions', () => {
+  it("does not transform nested functions", () => {
     expect(transform(`
       export default withAsyncContext(async () => {
         async function foo() {
@@ -158,16 +158,16 @@ describe('transforms', () => {
         }
         const ctx = useSomething()
       })
-    `)).toBeUndefined()
-  })
+    `)).toBeUndefined();
+  });
 
-  it('does not transform non target function', () => {
+  it("does not transform non target function", () => {
     expect(transform(`
       export default someFunction(async () => {
         const ctx1 = useSomething()
         await something()
         const ctx2 = useSomething()
       })
-    `)).toBeUndefined()
-  })
-})
+    `)).toBeUndefined();
+  });
+});

@@ -18,75 +18,75 @@ export interface UseContext<T> {
   /**
    * Exclude a synchronous function with the provided context.
    */
-  call: <R>(instance: T, cb: () => R) => R
+  call: <R>(instance: T, callback: () => R) => R
   /**
    * Exclude an asynchronous function with the provided context.
    * Requires installing the transform plugin to work properly.
    */
-  callAsync: <R>(instance: T, cb: () => R | Promise<R>) => Promise<R>
+  callAsync: <R>(instance: T, callback: () => R | Promise<R>) => Promise<R>
 }
 
 type OnAsyncRestore = () => void
 type OnAsyncLeave = () => void | OnAsyncRestore
 
 export function createContext<T = any> (): UseContext<T> {
-  let currentInstance: T = null
-  let isSingleton = false
+  let currentInstance: T;
+  let isSingleton = false;
 
   const checkConflict = (instance: T) => {
     if (currentInstance && currentInstance !== instance) {
-      throw new Error('Context conflict')
+      throw new Error("Context conflict");
     }
-  }
+  };
 
   return {
     use: () => {
-      if (currentInstance == null) {
-        throw new Error('Context is not available')
+      if (currentInstance === undefined) {
+        throw new Error("Context is not available");
       }
-      return currentInstance
+      return currentInstance;
     },
     tryUse: () => {
-      return currentInstance
+      return currentInstance;
     },
     set: (instance: T, replace?: Boolean) => {
       if (!replace) {
-        checkConflict(instance)
+        checkConflict(instance);
       }
-      currentInstance = instance
-      isSingleton = true
+      currentInstance = instance;
+      isSingleton = true;
     },
     unset: () => {
-      currentInstance = null
-      isSingleton = false
+      currentInstance = undefined;
+      isSingleton = false;
     },
-    call: (instance: T, cb) => {
-      checkConflict(instance)
-      currentInstance = instance
+    call: (instance: T, callback) => {
+      checkConflict(instance);
+      currentInstance = instance;
       try {
-        return cb()
+        return callback();
       } finally {
         if (!isSingleton) {
-          currentInstance = null
+          currentInstance = undefined;
         }
       }
     },
-    async callAsync (instance: T, cb) {
-      currentInstance = instance
-      const onRestore: OnAsyncRestore = () => { currentInstance = instance }
-      const onLeave: OnAsyncLeave = () => currentInstance === instance ? onRestore : undefined
-      asyncHandlers.add(onLeave)
+    async callAsync (instance: T, callback) {
+      currentInstance = instance;
+      const onRestore: OnAsyncRestore = () => { currentInstance = instance; };
+      const onLeave: OnAsyncLeave = () => currentInstance === instance ? onRestore : undefined;
+      asyncHandlers.add(onLeave);
       try {
-        const r = cb()
+        const r = callback();
         if (!isSingleton) {
-          currentInstance = null
+          currentInstance = undefined;
         }
-        return await r
+        return await r;
       } finally {
-        asyncHandlers.delete(onLeave)
+        asyncHandlers.delete(onLeave);
       }
     }
-  }
+  };
 }
 
 export interface ContextNamespace {
@@ -94,71 +94,73 @@ export interface ContextNamespace {
 }
 
 export function createNamespace<T = any> () {
-  const contexts: Record<string, UseContext<T>> = {}
+  const contexts: Record<string, UseContext<T>> = {};
 
   return {
     get (key) {
       if (!contexts[key]) {
-        contexts[key] = createContext()
+        contexts[key] = createContext();
       }
-      contexts[key] as UseContext<T>
-      return contexts[key]
+      contexts[key] as UseContext<T>;
+      return contexts[key];
     }
-  }
+  };
 }
 
-const _globalThis = ((typeof globalThis !== 'undefined')
+const _globalThis = ((typeof globalThis !== "undefined")
   ? globalThis
-  : (typeof self !== 'undefined')
+  : ((typeof self !== "undefined")
+    // eslint-disable-next-line no-undef
       ? self
-      : (typeof global !== 'undefined')
+      // eslint-disable-next-line unicorn/no-nested-ternary
+      : (typeof global !== "undefined")
           ? global
-          : (typeof window !== 'undefined')
+          : (typeof window !== "undefined")
               ? window
-              : {}) as typeof globalThis
+              : {})) as typeof globalThis;
 
-const globalKey = '__unctx__'
+const globalKey = "__unctx__";
 
 export const defaultNamespace: ContextNamespace =
-  _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace())
+  _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace());
 
-export const getContext = <T>(key: string) => defaultNamespace.get<T>(key)
+export const getContext = <T>(key: string) => defaultNamespace.get<T>(key);
 
-export const useContext = <T>(key: string) => getContext<T>(key).use
+export const useContext = <T>(key: string) => getContext<T>(key).use;
 
-const asyncHandlersKey = '__unctx_async_handlers__'
+const asyncHandlersKey = "__unctx_async_handlers__";
 const asyncHandlers: Set<OnAsyncLeave> =
-  _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = new Set())
+  _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = new Set());
 
-type AsyncFn<T> = () => Promise<T>
+type AsyncFunction<T> = () => Promise<T>
 
-export function executeAsync<T> (fn: AsyncFn<T>): [Promise<T>, () => void] {
-  const restores: OnAsyncRestore[] = []
+export function executeAsync<T> (function_: AsyncFunction<T>): [Promise<T>, () => void] {
+  const restores: OnAsyncRestore[] = [];
   for (const leaveHandler of asyncHandlers) {
-    const restore = leaveHandler()
+    const restore = leaveHandler();
     if (restore) {
-      restores.push(restore)
+      restores.push(restore);
     }
   }
   const restore = () => {
     for (const restore of restores) {
-      restore()
+      restore();
     }
+  };
+  let awaitable = function_();
+  if ("catch" in awaitable) {
+    awaitable = awaitable.catch((error) => {
+      restore();
+      throw error;
+    });
   }
-  let awaitable = fn()
-  if ('catch' in awaitable) {
-    awaitable = awaitable.catch((e) => {
-      restore()
-      throw e
-    })
-  }
-  return [awaitable, restore]
+  return [awaitable, restore];
 }
 
-export function withAsyncContext<T=any> (fn: AsyncFn<T>, transformed?: boolean): AsyncFn<T> {
+export function withAsyncContext<T=any> (function_: AsyncFunction<T>, transformed?: boolean): AsyncFunction<T> {
   if (!transformed) {
     // eslint-disable-next-line no-console
-    console.warn('[unctx] `withAsyncContext` needs transformation for async context support in', fn, '\n', fn.toString())
+    console.warn("[unctx] `withAsyncContext` needs transformation for async context support in", function_, "\n", function_.toString());
   }
-  return fn
+  return function_;
 }
