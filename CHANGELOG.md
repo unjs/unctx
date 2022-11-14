@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/unjs/unctx/compare/v2.0.2...v2.1.0) (2022-11-14)
+
+
+### Features
+
+* **createNamespace:** allow creating typed namespace ([#31](https://github.com/unjs/unctx/issues/31)) ([fcf580b](https://github.com/unjs/unctx/commit/fcf580b8de9b0e18d75d87cfc1878518b4081771))
+
 ### [2.0.2](https://github.com/unjs/unctx/compare/v2.0.1...v2.0.2) (2022-08-29)
 
 
