@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { createContext, withAsyncContext } from "../src";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const noop = () => {};
 
 describe("callAsync", () => {
   it("call and use", async () => {
@@ -85,5 +86,17 @@ describe("callAsync", () => {
     expect(console.warn).toHaveBeenCalledOnce();
     // eslint-disable-next-line no-console
     console.warn = _warn;
+  });
+
+  it("await but no async fn", async () => {
+    const context = createContext();
+    await context.callAsync("A", async () => {
+      expect(context.use()).toBe("A");
+      await noop();
+      expect(context.use()).toBe("A");
+      await "A";
+      expect(context.use()).toBe("A");
+      return context.use();
+    });
   });
 });
