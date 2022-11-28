@@ -148,7 +148,7 @@ export function executeAsync<T> (function_: AsyncFunction<T>): [Promise<T>, () =
     }
   };
   let awaitable = function_();
-  if ("catch" in awaitable) {
+  if (awaitable && typeof awaitable === "object" && "catch" in awaitable) {
     awaitable = awaitable.catch((error) => {
       restore();
       throw error;
