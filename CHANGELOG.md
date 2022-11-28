@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/unjs/unctx/compare/v2.1.0...v2.1.1) (2022-11-28)
+
+
+### Bug Fixes
+
+* check if awaitable is an object ([#43](https://github.com/unjs/unctx/issues/43)) ([25f9909](https://github.com/unjs/unctx/commit/25f990923a878f7335dac668f55c034a91a9f20a))
+
 ## [2.1.0](https://github.com/unjs/unctx/compare/v2.0.2...v2.1.0) (2022-11-14)
 
 
