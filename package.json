@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@types/estree": "^1.0.0",
-    "@types/jest": "^29.2.3",
+    "@types/jest": "^29.2.4",
     "@types/node": "^18.11.10",
     "@vitest/coverage-c8": "^0.25.3",
     "eslint": "^8.29.0",
