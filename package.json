@@ -46,7 +46,7 @@
     "acorn": "^8.8.1",
     "estree-walker": "^3.0.1",
     "magic-string": "^0.27.0",
-    "unplugin": "^1.0.0"
+    "unplugin": "^1.0.1"
   },
   "devDependencies": {
     "@types/estree": "^1.0.0",
@@ -61,5 +61,5 @@
     "unbuild": "^1.0.2",
     "vitest": "^0.25.7"
   },
-  "packageManager": "pnpm@7.18.1"
+  "packageManager": "pnpm@7.18.2"
 }
