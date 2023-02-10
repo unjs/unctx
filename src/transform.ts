@@ -1,12 +1,12 @@
-
 import * as acorn from "acorn";
 import MagicString from "magic-string";
 import { walk } from "estree-walker";
 import type {
-  Node, CallExpression,
+  Node,
+  CallExpression,
   BlockStatement,
   AwaitExpression,
-  Position
+  Position,
 } from "estree";
 
 export interface TransformerOptions {
@@ -15,39 +15,39 @@ export interface TransformerOptions {
    *
    * @default ['withAsyncContext', 'callAsync']
    */
-  asyncFunctions?: string[]
+  asyncFunctions?: string[];
   /**
    * @default 'unctx'
    */
-  helperModule?: string
+  helperModule?: string;
   /**
    * @default 'executeAsync'
    */
-  helperName?: string
+  helperName?: string;
 }
 
-export function createTransformer (options: TransformerOptions = {}) {
+export function createTransformer(options: TransformerOptions = {}) {
   options = {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
     helperName: "executeAsync",
-    ...options
+    ...options,
   };
 
   const matchRE = new RegExp(`\\b(${options.asyncFunctions.join("|")})\\(`);
 
-  function shouldTransform (code: string) {
+  function shouldTransform(code: string) {
     return typeof code === "string" && matchRE.test(code);
   }
 
-  function transform (code: string, options_: { force?: false } = {}) {
+  function transform(code: string, options_: { force?: false } = {}) {
     if (!options_.force && !shouldTransform(code)) {
       return;
     }
     const ast = acorn.parse(code, {
       sourceType: "module",
       ecmaVersion: "latest",
-      locations: true
+      locations: true,
     });
 
     const s = new MagicString(code);
@@ -55,8 +55,8 @@ export function createTransformer (options: TransformerOptions = {}) {
 
     let detected = false;
 
-    walk(ast, {
-      enter (node: Node) {
+    walk(ast as any, {
+      enter(node: Node) {
         if (node.type === "CallExpression") {
           const functionName = _getFunctionName(node.callee);
           if (options.asyncFunctions.includes(functionName)) {
@@ -69,27 +69,33 @@ export function createTransformer (options: TransformerOptions = {}) {
             }
           }
         }
-      }
+      },
     });
 
     if (!detected) {
       return;
     }
 
-    s.appendLeft(0, `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`);
+    s.appendLeft(
+      0,
+      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`
+    );
 
     return {
       code: s.toString(),
-      magicString: s
+      magicString: s,
     };
 
-    function toIndex (pos: Position) {
+    function toIndex(pos: Position) {
       return lines.slice(0, pos.line - 1).join("\n").length + pos.column + 1;
     }
 
-    function transformFunctionBody (node: CallExpression) {
+    function transformFunctionBody(node: CallExpression) {
       for (const function_ of node.arguments) {
-        if (function_.type !== "ArrowFunctionExpression" && function_.type !== "FunctionExpression") {
+        if (
+          function_.type !== "ArrowFunctionExpression" &&
+          function_.type !== "FunctionExpression"
+        ) {
           continue;
         }
 
@@ -102,29 +108,30 @@ export function createTransformer (options: TransformerOptions = {}) {
 
         let injectVariable = false;
         walk(body, {
-          enter (node: Node, parent: Node | undefined) {
+          enter(node: Node, parent: Node | undefined) {
             if (node.type === "AwaitExpression") {
               detected = true;
               injectVariable = true;
               injectForNode(node, parent);
             }
             // Skip transform for nested functions
-            if (node.type === "ArrowFunctionExpression" || node.type === "FunctionExpression" || node.type === "FunctionDeclaration") {
+            if (
+              node.type === "ArrowFunctionExpression" ||
+              node.type === "FunctionExpression" ||
+              node.type === "FunctionDeclaration"
+            ) {
               return this.skip();
             }
-          }
+          },
         });
 
         if (injectVariable) {
-          s.appendLeft(
-            toIndex(body.loc.start) + 1,
-            "let __temp, __restore;"
-          );
+          s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
         }
       }
     }
 
-    function injectForNode (node: AwaitExpression, parent: Node | undefined) {
+    function injectForNode(node: AwaitExpression, parent: Node | undefined) {
       const body = code.slice(
         toIndex(node.argument.loc.start),
         toIndex(node.argument.loc.end)
@@ -144,11 +151,11 @@ export function createTransformer (options: TransformerOptions = {}) {
 
   return {
     transform,
-    shouldTransform
+    shouldTransform,
   };
 }
 
-function _getFunctionName (node: Node) {
+function _getFunctionName(node: Node) {
   if (node.type === "Identifier") {
     return node.name;
   } else if (node.type === "MemberExpression") {
