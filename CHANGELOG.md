@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.1.2
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.1.1...v2.1.2)
+
+
+### 🏡 Chore
+
+  - Update dependencies and repo ([57a6e2b](https://github.com/unjs/unctx/commit/57a6e2b))
+
+### ❤️  Contributors
+
+- Pooya Parsa <pooya@pi0.io>
+
 ### [2.1.1](https://github.com/unjs/unctx/compare/v2.1.0...v2.1.1) (2022-11-28)
 
 
