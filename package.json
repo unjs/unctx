@@ -45,12 +45,12 @@
   "dependencies": {
     "acorn": "^8.8.2",
     "estree-walker": "^3.0.3",
-    "magic-string": "^0.29.0",
+    "magic-string": "^0.30.0",
     "unplugin": "^1.1.0"
   },
   "devDependencies": {
     "@types/estree": "^1.0.0",
-    "@types/node": "^18.14.0",
+    "@types/node": "^18.14.1",
     "@vitest/coverage-c8": "^0.28.5",
     "changelogen": "^0.4.1",
     "eslint": "^8.34.0",
