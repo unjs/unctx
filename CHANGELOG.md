@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.2.0
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.1.2...v2.2.0)
+
+
+### 🚀 Enhancements
+
+  - Support transformation of object properties ([#69](https://github.com/unjs/unctx/pull/69))
+
+### 🏡 Chore
+
+  - Update dependencies ([41f6c13](https://github.com/unjs/unctx/commit/41f6c13))
+  - Lint ([9befb11](https://github.com/unjs/unctx/commit/9befb11))
+
+### ❤️  Contributors
+
+- Daniel Roe <daniel@roe.dev>
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v2.1.2
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.1.1...v2.1.2)
