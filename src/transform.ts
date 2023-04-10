@@ -24,6 +24,13 @@ export interface TransformerOptions {
    * @default 'executeAsync'
    */
   helperName?: string;
+  /**
+   * Whether to transform properties of an object defined with a helper function. For example,
+   * to transform key `middleware` within the object defined with function `defineMeta`, you would pass:
+   * `{ defineMeta: ['middleware'] }`.
+   * @default {}
+   */
+  objectDefinitions?: Record<string, string[]>;
 }
 
 export function createTransformer(options: TransformerOptions = {}) {
@@ -31,10 +38,17 @@ export function createTransformer(options: TransformerOptions = {}) {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
     helperName: "executeAsync",
+    objectDefinitions: {},
     ...options,
   };
 
-  const matchRE = new RegExp(`\\b(${options.asyncFunctions.join("|")})\\(`);
+  const objectDefinitionFunctions = Object.keys(options.objectDefinitions);
+
+  const matchRE = new RegExp(
+    `\\b(${[...options.asyncFunctions, ...objectDefinitionFunctions].join(
+      "|"
+    )})\\(`
+  );
 
   function shouldTransform(code: string) {
     return typeof code === "string" && matchRE.test(code);
@@ -60,11 +74,35 @@ export function createTransformer(options: TransformerOptions = {}) {
         if (node.type === "CallExpression") {
           const functionName = _getFunctionName(node.callee);
           if (options.asyncFunctions.includes(functionName)) {
-            transformFunctionBody(node);
+            transformFunctionArguments(node);
             if (functionName !== "callAsync") {
               const lastArgument = node.arguments[node.arguments.length - 1];
               if (lastArgument) {
                 s.appendRight(toIndex(lastArgument.loc.end), ",1");
+              }
+            }
+          }
+          if (objectDefinitionFunctions.includes(functionName)) {
+            for (const argument of node.arguments) {
+              if (argument.type !== "ObjectExpression") {
+                continue;
+              }
+
+              for (const property of argument.properties) {
+                if (
+                  property.type !== "Property" ||
+                  property.key.type !== "Identifier"
+                ) {
+                  continue;
+                }
+
+                if (
+                  options.objectDefinitions[functionName].includes(
+                    property.key?.name
+                  )
+                ) {
+                  transformFunctionBody(property.value);
+                }
               }
             }
           }
@@ -90,44 +128,48 @@ export function createTransformer(options: TransformerOptions = {}) {
       return lines.slice(0, pos.line - 1).join("\n").length + pos.column + 1;
     }
 
-    function transformFunctionBody(node: CallExpression) {
+    function transformFunctionBody(function_: Node) {
+      if (
+        function_.type !== "ArrowFunctionExpression" &&
+        function_.type !== "FunctionExpression"
+      ) {
+        return;
+      }
+
+      // No need to transform non-async function
+      if (!function_.async) {
+        return;
+      }
+
+      const body = function_.body as BlockStatement;
+
+      let injectVariable = false;
+      walk(body, {
+        enter(node: Node, parent: Node | undefined) {
+          if (node.type === "AwaitExpression") {
+            detected = true;
+            injectVariable = true;
+            injectForNode(node, parent);
+          }
+          // Skip transform for nested functions
+          if (
+            node.type === "ArrowFunctionExpression" ||
+            node.type === "FunctionExpression" ||
+            node.type === "FunctionDeclaration"
+          ) {
+            return this.skip();
+          }
+        },
+      });
+
+      if (injectVariable) {
+        s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
+      }
+    }
+
+    function transformFunctionArguments(node: CallExpression) {
       for (const function_ of node.arguments) {
-        if (
-          function_.type !== "ArrowFunctionExpression" &&
-          function_.type !== "FunctionExpression"
-        ) {
-          continue;
-        }
-
-        // No need to transform non-async function
-        if (!function_.async) {
-          continue;
-        }
-
-        const body = function_.body as BlockStatement;
-
-        let injectVariable = false;
-        walk(body, {
-          enter(node: Node, parent: Node | undefined) {
-            if (node.type === "AwaitExpression") {
-              detected = true;
-              injectVariable = true;
-              injectForNode(node, parent);
-            }
-            // Skip transform for nested functions
-            if (
-              node.type === "ArrowFunctionExpression" ||
-              node.type === "FunctionExpression" ||
-              node.type === "FunctionDeclaration"
-            ) {
-              return this.skip();
-            }
-          },
-        });
-
-        if (injectVariable) {
-          s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
-        }
+        transformFunctionBody(function_);
       }
     }
 

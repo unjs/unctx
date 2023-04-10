@@ -4,6 +4,9 @@ import { createTransformer } from "../src/transform";
 describe("transforms", () => {
   const transformer = createTransformer({
     asyncFunctions: ["withAsyncContext", "callAsync"],
+    objectDefinitions: {
+      defineSomething: ["someKey"],
+    },
   });
 
   function transform(input: string) {
@@ -93,7 +96,7 @@ describe("transforms", () => {
         } catch (e) {
           user = null;
         }
-      
+
         if (!user)
           return navigateTo('/');
       })
@@ -188,6 +191,70 @@ describe("transforms", () => {
         await something()
         const ctx2 = useSomething()
       })
+    `)
+    ).toBeUndefined();
+  });
+
+  it("transforms certain keys of an object", () => {
+    expect(
+      transform(`
+      export default defineSomething({
+        someKey: async () => {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        },
+        async someKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        },
+        ...someKey,
+        someKey: 421,
+        someKey () {
+          const ctx1 = useSomething()
+          const ctx2 = useSomething()
+        },
+        async someOtherKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        }
+      })
+    `)
+    ).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default defineSomething({
+        someKey: async () => {let __temp, __restore;
+          const ctx1 = useSomething()
+          ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+          const ctx2 = useSomething()
+        },
+        async someKey () {let __temp, __restore;
+          const ctx1 = useSomething()
+          ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+          const ctx2 = useSomething()
+        },
+        ...someKey,
+        someKey: 421,
+        someKey () {
+          const ctx1 = useSomething()
+          const ctx2 = useSomething()
+        },
+        async someOtherKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        }
+      })
+      "
+    `);
+  });
+
+  it("doesn't transform non-objects", () => {
+    expect(
+      transform(`
+      export default defineSomething('test')
     `)
     ).toBeUndefined();
   });
