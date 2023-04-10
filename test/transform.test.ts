@@ -188,6 +188,12 @@ describe("transforms", () => {
           await something()
           const ctx2 = useSomething()
         },
+        ...someKey,
+        someKey: 421,
+        someKey () {
+          const ctx1 = useSomething()
+          const ctx2 = useSomething()
+        },
         async someOtherKey () {
           const ctx1 = useSomething()
           await something()
@@ -208,6 +214,12 @@ describe("transforms", () => {
           ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
           const ctx2 = useSomething()
         },
+        ...someKey,
+        someKey: 421,
+        someKey () {
+          const ctx1 = useSomething()
+          const ctx2 = useSomething()
+        },
         async someOtherKey () {
           const ctx1 = useSomething()
           await something()
@@ -216,5 +228,13 @@ describe("transforms", () => {
       })
       "
     `)
+  })
+
+  it("doesn't transform non-objects", () => {
+    expect(
+      transform(`
+      export default defineSomething('test')
+    `)
+    ).toBeUndefined()
   })
 });
