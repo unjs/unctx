@@ -174,7 +174,7 @@ describe("transforms", () => {
     `)).toBeUndefined();
   });
 
-  it.only("transforms certain keys of an object", () => {
+  it("transforms certain keys of an object", () => {
     expect(
       transform(`
       export default defineSomething({
