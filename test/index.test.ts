@@ -26,7 +26,9 @@ describe("createContext", () => {
   it("unset on error", () => {
     const context = createContext();
     // eslint-disable-next-line unicorn/consistent-function-scoping
-    const throwError = () => { throw new Error("Foo"); };
+    const throwError = () => {
+      throw new Error("Foo");
+    };
     expect(() => context.call("A", throwError)).toThrow("Foo");
     expect(() => context.call("B", throwError)).toThrow("Foo");
   });

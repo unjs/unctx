@@ -5,25 +5,30 @@ describe("transforms", () => {
   const transformer = createTransformer({
     asyncFunctions: ["withAsyncContext", "callAsync"],
     asyncObjectKeys: {
-      defineSomething: ['someKey']
-    }
+      defineSomething: ["someKey"],
+    },
   });
 
-  function transform (input: string) {
+  function transform(input: string) {
     return transformer.transform(
       // Slice 6 spaces indention for snapshot alignment
-      input.split("\n").map(index => index.slice(6)).join("\n")
+      input
+        .split("\n")
+        .map((index) => index.slice(6))
+        .join("\n")
     )?.code;
   }
 
   it("transforms", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         const ctx1 = useSomething()
         await something()
         const ctx2 = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         const ctx1 = useSomething()
@@ -35,13 +40,15 @@ describe("transforms", () => {
   });
 
   it("transforms await as variable", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         const foo = await something()
         const bar = hello(await something())
         const ctx = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         const foo = (([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp)
@@ -53,7 +60,8 @@ describe("transforms", () => {
   });
 
   it("transforms await in nested scopes", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         for (const i of foo) {
           if (i) {
@@ -62,7 +70,8 @@ describe("transforms", () => {
         }
         const ctx = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         for (const i of foo) {
@@ -77,7 +86,8 @@ describe("transforms", () => {
   });
 
   it("transforms await in try-catch", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         let user;
 
@@ -86,11 +96,12 @@ describe("transforms", () => {
         } catch (e) {
           user = null;
         }
-      
+
         if (!user)
           return navigateTo('/');
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
         let user;
@@ -109,13 +120,15 @@ describe("transforms", () => {
   });
 
   it("transforms dot usage", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default ctx.callAsync(async () => {
         const ctx1 = useSomething()
         await something()
         const ctx2 = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default ctx.callAsync(async () => {let __temp, __restore;
         const ctx1 = useSomething()
@@ -125,13 +138,15 @@ describe("transforms", () => {
       "
     `);
 
-    expect(transform(`
+    expect(
+      transform(`
       export default x.ctx.callAsync(async () => {
         const ctx1 = useSomething()
         await something()
         const ctx2 = useSomething()
       })
-    `)).toMatchInlineSnapshot(`
+    `)
+    ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default x.ctx.callAsync(async () => {let __temp, __restore;
         const ctx1 = useSomething()
@@ -143,15 +158,18 @@ describe("transforms", () => {
   });
 
   it("does not transform non async usage", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         const ctx = useSomething()
       })
-    `)).toBeUndefined();
+    `)
+    ).toBeUndefined();
   });
 
   it("does not transform nested functions", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default withAsyncContext(async () => {
         async function foo() {
           await something()
@@ -161,17 +179,20 @@ describe("transforms", () => {
         }
         const ctx = useSomething()
       })
-    `)).toBeUndefined();
+    `)
+    ).toBeUndefined();
   });
 
   it("does not transform non target function", () => {
-    expect(transform(`
+    expect(
+      transform(`
       export default someFunction(async () => {
         const ctx1 = useSomething()
         await something()
         const ctx2 = useSomething()
       })
-    `)).toBeUndefined();
+    `)
+    ).toBeUndefined();
   });
 
   it("transforms certain keys of an object", () => {
@@ -227,14 +248,14 @@ describe("transforms", () => {
         }
       })
       "
-    `)
-  })
+    `);
+  });
 
   it("doesn't transform non-objects", () => {
     expect(
       transform(`
       export default defineSomething('test')
     `)
-    ).toBeUndefined()
-  })
+    ).toBeUndefined();
+  });
 });

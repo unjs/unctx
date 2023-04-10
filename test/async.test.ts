@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createContext, withAsyncContext } from "../src";
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const noop = () => {};
 
 describe("callAsync", () => {
@@ -26,7 +26,7 @@ describe("callAsync", () => {
         await sleep(5);
         expect(context.use()).toBe("C");
         return context.use();
-      })
+      }),
     ]);
 
     expect(result).toEqual(["A", "B", "C"]);
@@ -45,11 +45,14 @@ describe("callAsync", () => {
   it("withAsyncContext", async () => {
     const context = createContext();
     const _callAsync = context.callAsync; // Skip transform
-    await _callAsync("A", withAsyncContext(async () => {
-      expect(context.use()).toBe("A");
-      await sleep(1);
-      expect(context.use()).toBe("A");
-    }));
+    await _callAsync(
+      "A",
+      withAsyncContext(async () => {
+        expect(context.use()).toBe("A");
+        await sleep(1);
+        expect(context.use()).toBe("A");
+      })
+    );
   });
 
   it("withAsyncContext + try/catch", async () => {
@@ -60,13 +63,16 @@ describe("callAsync", () => {
       await sleep(1);
       throw new Error("error");
     };
-    await _callAsync("A", withAsyncContext(async () => {
-      expect(context.use()).toBe("A");
-      try {
-        await promise();
-      } catch {}
-      expect(context.use()).toBe("A");
-    }));
+    await _callAsync(
+      "A",
+      withAsyncContext(async () => {
+        expect(context.use()).toBe("A");
+        try {
+          await promise();
+        } catch {}
+        expect(context.use()).toBe("A");
+      })
+    );
   });
 
   it("withAsyncContext (not transformed)", async () => {
@@ -77,11 +83,14 @@ describe("callAsync", () => {
     const _warn = console.warn;
     // eslint-disable-next-line no-console
     console.warn = vi.fn();
-    await _callAsync("A", _withAsyncContext(async () => {
-      expect(context.use()).toBe("A");
-      await sleep(1);
-      expect(context.tryUse()).toBe(undefined);
-    }));
+    await _callAsync(
+      "A",
+      _withAsyncContext(async () => {
+        expect(context.use()).toBe("A");
+        await sleep(1);
+        expect(context.tryUse()).toBe(undefined);
+      })
+    );
     // eslint-disable-next-line no-console
     expect(console.warn).toHaveBeenCalledOnce();
     // eslint-disable-next-line no-console
