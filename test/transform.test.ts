@@ -3,7 +3,10 @@ import { createTransformer } from "../src/transform";
 
 describe("transforms", () => {
   const transformer = createTransformer({
-    asyncFunctions: ["withAsyncContext", "callAsync"]
+    asyncFunctions: ["withAsyncContext", "callAsync"],
+    objectDefinitions: {
+      defineSomething: ['someKey']
+    }
   });
 
   function transform (input: string) {
@@ -170,4 +173,48 @@ describe("transforms", () => {
       })
     `)).toBeUndefined();
   });
+
+  it.only("transforms certain keys of an object", () => {
+    expect(
+      transform(`
+      export default defineSomething({
+        someKey: async () => {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        },
+        async someKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        },
+        async someOtherKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        }
+      })
+    `)
+    ).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default defineSomething({
+        someKey: async () => {let __temp, __restore;
+          const ctx1 = useSomething()
+          ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+          const ctx2 = useSomething()
+        },
+        async someKey () {let __temp, __restore;
+          const ctx1 = useSomething()
+          ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+          const ctx2 = useSomething()
+        },
+        async someOtherKey () {
+          const ctx1 = useSomething()
+          await something()
+          const ctx2 = useSomething()
+        }
+      })
+      "
+    `)
+  })
 });
