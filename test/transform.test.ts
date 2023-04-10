@@ -4,7 +4,7 @@ import { createTransformer } from "../src/transform";
 describe("transforms", () => {
   const transformer = createTransformer({
     asyncFunctions: ["withAsyncContext", "callAsync"],
-    objectDefinitions: {
+    asyncObjectKeys: {
       defineSomething: ['someKey']
     }
   });
