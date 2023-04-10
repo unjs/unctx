@@ -30,7 +30,7 @@ export interface TransformerOptions {
    * `{ defineMeta: ['middleware'] }`.
    * @default {}
    */
-  asyncObjectKeys?: Record<string, string[]>;
+  objectDefinitions?: Record<string, string[]>;
 }
 
 export function createTransformer(options: TransformerOptions = {}) {
@@ -38,11 +38,11 @@ export function createTransformer(options: TransformerOptions = {}) {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
     helperName: "executeAsync",
-    asyncObjectKeys: {},
+    objectDefinitions: {},
     ...options,
   };
 
-  const objectDefinitionFunctions = Object.keys(options.asyncObjectKeys);
+  const objectDefinitionFunctions = Object.keys(options.objectDefinitions);
 
   const matchRE = new RegExp(
     `\\b(${[...options.asyncFunctions, ...objectDefinitionFunctions].join(
@@ -97,7 +97,7 @@ export function createTransformer(options: TransformerOptions = {}) {
                 }
 
                 if (
-                  options.asyncObjectKeys[functionName].includes(
+                  options.objectDefinitions[functionName].includes(
                     property.key?.name
                   )
                 ) {
