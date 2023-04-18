@@ -49,29 +49,6 @@ function setup() {
 
 **Note:** when no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
 
-## Async Hooks
-
-Unctx supports [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve async contexts without need of code transform for async support. To enable this mode, you need to set `asyncHooks: true` and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
-
-(See also [tc39 proposal](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/))
-
-```ts
-import { createContext } from "unctx";
-import { AsyncLocalStorage } from "node:async_hooks";
-
-const ctx = createContext({
-  asyncHooks: true,
-  AsyncLocalStorage,
-});
-
-ctx.call("123", () => {
-  setTimeout(() => {
-    // Prints 123
-    console.log(ctx.use());
-  }, 100);
-});
-```
-
 ## Using Namespaces
 
 To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
@@ -116,7 +93,7 @@ const { use: useAwesome } = createContext<Awesome>();
 
 ## Async Context
 
-Normally, using context is only possible before first await statement:
+Using context is only possible in non-async usages and only before the first await statement. This is to make sure context is not shared between concurrent calls.
 
 ```js
 async function setup() {
@@ -126,7 +103,7 @@ async function setup() {
 }
 ```
 
-A simple workaround, is caching context before first await and use it directly:
+A simple workaround, is caching context into a local variable:
 
 ```js
 async function setup() {
@@ -136,9 +113,34 @@ async function setup() {
 }
 ```
 
-However, this is not always as easy as making a variable when using nested composables.
+This is not always an elegant and easy for making a variable and passing it around. Afterall this is purpose of unctx to make sure context magically available everywhere in composables!
 
-Unctx provides a better solution that transforms async to automatically restore context after each await call. This requires using a bundler such as Rollup, Vite or Webpack.
+### Native Async Hooks
+
+Unctx supports [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+
+See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relavant platform specific docs.
+
+```ts
+import { createContext } from "unctx";
+import { AsyncLocalStorage } from "node:async_hooks";
+
+const ctx = createContext({
+  asyncContext: true,
+  AsyncLocalStorage,
+});
+
+ctx.call("123", () => {
+  setTimeout(() => {
+    // Prints 123
+    console.log(ctx.use());
+  }, 100);
+});
+```
+
+### Async Transform
+
+Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each await call. This requires using a bundler such as Rollup, Vite or Webpack.
 
 Import and register transform plugin:
 
@@ -184,7 +186,7 @@ Composition of functions is possible using temporary context injection. When cal
 
 **context can be only used before first await**:
 
-Please check Async context section.
+Please check [Async Context](#async-context) section.
 
 **`Context conflict` error**:
 

@@ -32,7 +32,7 @@ type OnAsyncRestore = () => void;
 type OnAsyncLeave = () => void | OnAsyncRestore;
 
 export interface ContextOptions {
-  asyncHooks?: boolean;
+  asyncContext?: boolean;
   AsyncLocalStorage?: typeof AsyncLocalStorage;
 }
 
@@ -50,7 +50,7 @@ export function createContext<T = any>(
 
   // Async hooks support
   let als: AsyncLocalStorage<any>;
-  if (opts.asyncHooks) {
+  if (opts.asyncContext) {
     const _AsyncLocalStorage: typeof AsyncLocalStorage<any> =
       opts.AsyncLocalStorage || globalThis.AsyncLocalStorage;
     if (_AsyncLocalStorage) {

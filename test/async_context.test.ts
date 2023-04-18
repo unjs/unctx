@@ -4,7 +4,7 @@ import { createContext } from "../src";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe("Async hooks", () => {
+describe("Async context", () => {
   it("AsyncLocalStorage works", async () => {
     const asl = new AsyncLocalStorage<string>();
     let _ctxInstance: string;
@@ -22,7 +22,7 @@ describe("Async hooks", () => {
 
   it("call and use", async () => {
     const context = createContext({
-      asyncHooks: true,
+      asyncContext: true,
       AsyncLocalStorage,
     });
 
