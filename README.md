@@ -102,7 +102,7 @@ This is not always an elegant and easy way by making a variable and passing it a
 
 ### Native Async Hooks
 
-Unctx supports [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+Unctx supports Node.js [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
 
 See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relavant platform specific docs.
 
