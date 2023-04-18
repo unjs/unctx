@@ -91,9 +91,9 @@ async function setup() {
 
 This is not always an elegant and easy way by making a variable and passing it around. After all, this is the purpose of unctx to make sure context is magically available everywhere in composables!
 
-### Native Async Hooks
+### Native Async Context
 
-Unctx supports Node.js [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provides an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+Unctx supports Node.js [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provides an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
 
 See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relevant platform specific docs.
 

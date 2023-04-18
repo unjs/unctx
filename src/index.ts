@@ -48,7 +48,7 @@ export function createContext<T = any>(
     }
   };
 
-  // Async hooks support
+  // Async context support
   let als: AsyncLocalStorage<any>;
   if (opts.asyncContext) {
     const _AsyncLocalStorage: typeof AsyncLocalStorage<any> =
