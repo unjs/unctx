@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.3.0
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.2.0...v2.3.0)
+
+
+### 🚀 Enhancements
+
+  - Support native async context ([#73](https://github.com/unjs/unctx/pull/73))
+
+### 📖 Documentation
+
+  - Fix grammer issues ([12a274d](https://github.com/unjs/unctx/commit/12a274d))
+
+### 🏡 Chore
+
+  - Add codecov.yml ([96bbded](https://github.com/unjs/unctx/commit/96bbded))
+  - Rename hooks to context ([3715097](https://github.com/unjs/unctx/commit/3715097))
+
+### ❤️  Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v2.2.0
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.1.2...v2.2.0)
