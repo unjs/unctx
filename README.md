@@ -1,6 +1,6 @@
 # 🍦 unctx
 
-> Composition-api in Vanilla js
+> Composition-API in Vanilla js
 
 [![npm version][npm-v-src]][npm-v-href]
 [![npm downloads][npm-dm-src]][npm-dm-href]
@@ -8,9 +8,9 @@
 [![bundle phobia][bundlephobia-src]][bundlephobia-href]
 [![codecov][codecov-src]][codecov-href]
 
-## What is it?
+## What is unctx?
 
-[Vue.js](https://vuejs.org) introduced an amazing pattern called [Composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that allows organizing complex logic by splitting it into reusable functions and grouping in logical order. `unctx` allows easily implementing composition api pattern in your javascript libraries without hassle.
+[Vue.js](https://vuejs.org) introduced an amazing pattern called [Composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that allows organizing complex logic by splitting it into reusable functions and grouping in logical order. `unctx` allows easily implementing composition API pattern in your javascript libraries without hassle.
 
 ## Usage
 
@@ -31,8 +31,8 @@ export const useAwesome = ctx.use;
 
 // ...
 ctx.call({ test: 1 }, () => {
-  // This is similar to vue setup function
-  // Any function called here, can use `useAwesome` to get { test: 1 }
+  // This is similar to the vue setup function
+  // Any function called here can use `useAwesome` to get { test: 1 }
 });
 ```
 
@@ -47,11 +47,11 @@ function setup() {
 }
 ```
 
-**Note:** when no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
+**Note:** When no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
 
 ### Using Namespaces
 
-To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
+To avoid issues with multiple version of the library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for the key to avoid conflict with other js libraries. Using the npm package name is recommended. Using symbols has no effect since it still causes multiple context issues.
 
 ```js
 import { useContext, getContext } from "unctx";
@@ -62,7 +62,7 @@ const useAwesome = useContext("awesome-lib");
 // const awesomeContext = getContext('awesome-lib')
 ```
 
-You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.
+You can also create your internal namespace with `createNamespace` utility for more advanced use cases.
 
 ## Async Context
 
@@ -79,7 +79,7 @@ async function setup() {
 }
 ```
 
-A simple workaround, is caching context into a local variable:
+A simple workaround is caching context into a local variable:
 
 ```js
 async function setup() {
@@ -89,13 +89,13 @@ async function setup() {
 }
 ```
 
-This is not always an elegant and easy way by making a variable and passing it around. Afterall this is tbe purpose of unctx to make sure context is magically available everywhere in composables!
+This is not always an elegant and easy way by making a variable and passing it around. After all, this is the purpose of unctx to make sure context is magically available everywhere in composables!
 
 ### Native Async Hooks
 
-Unctx supports Node.js [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+Unctx supports Node.js [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provides an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
 
-See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relavant platform specific docs.
+See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relevant platform specific docs.
 
 ```ts
 import { createContext } from "unctx";
@@ -116,7 +116,7 @@ ctx.call("123", () => {
 
 ### Async Transform
 
-Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each await call. This requires using a bundler such as Rollup, Vite or Webpack.
+Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each async/await statement. This requires using a bundler such as Rollup, Vite, or Webpack.
 
 Import and register transform plugin:
 
@@ -158,7 +158,7 @@ const setup = withAsyncContext(async () => {
 
 If you are sure it is safe to use a shared instance (not depending to request), you can also use `ctx.set` and `ctx.unset` for a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
-**Note:** You cannot combine `set` with `call`. Always use `unset` before replacing instance otherwise you will get `Context conflict` error.
+**Note:** You cannot combine `set` with `call`. Always use `unset` before replacing the instance otherwise you will get `Context conflict` error.
 
 ```js
 import { createContext } from "unctx";
@@ -183,7 +183,7 @@ const { use: useAwesome } = createContext<Awesome>();
 
 ## Under the hood
 
-Composition of functions is possible using temporary context injection. When calling `ctx.call(instance, cb)`, `instance` argument will be stored in a temporary variable then `cb` is called. Any function inside `cb`, can then implicitly access instance by using `ctx.use` (or `useAwesome`)
+The composition of functions is possible using temporary context injection. When calling `ctx.call(instance, cb)`, `instance` argument will be stored in a temporary variable then `cb` is called. Any function inside `cb`, can then implicitly access the instance by using `ctx.use` (or `useAwesome`)
 
 ## Pitfalls
 
@@ -193,9 +193,9 @@ Please check [Async Context](#async-context) section.
 
 **`Context conflict` error**:
 
-In your library, you should only keep one `call()` running at a time (unless calling with same reference for first argument)
+In your library, you should only keep one `call()` running at a time (unless calling with the same reference for the first argument)
 
-For instance this makes an error:
+For instance, this makes an error:
 
 ```js
 ctx.call({ test: 1 }, () => {
