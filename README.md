@@ -64,24 +64,6 @@ const useAwesome = useContext("awesome-lib");
 
 You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.
 
-## Singleton Pattern
-
-If you are sure it is safe to use a shared instance (not depending to request), you can also use `ctx.set` and `ctx.unset` for a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
-
-**Note:** You cannot combine `set` with `call`. Always use `unset` before replacing instance otherwise you will get `Context conflict` error.
-
-```js
-import { createContext } from "unctx";
-
-const ctx = createContext();
-ctx.set(new Awesome());
-
-// Replacing instance without unset
-// ctx.set(new Awesome(), true)
-
-export const useAwesome = ctx.use;
-```
-
 ## TypeScript
 
 A generic type exists on all utilities to be set for instance/context type:
@@ -98,6 +80,9 @@ Using context is only possible in non-async usages and only before the first awa
 ```js
 async function setup() {
   console.log(useAwesome()); // Returns context
+  setTimeout(() => {
+    console.log(useAwesome());
+  }, 1); // Returns null
   await new Promise((resolve) => setTimeout(resolve, 1000));
   console.log(useAwesome()); // Returns null
 }
@@ -107,13 +92,13 @@ A simple workaround, is caching context into a local variable:
 
 ```js
 async function setup() {
-  const ctx = useAwesome();
+  const ctx = useAwesome(); // We can directly access cached version of ctx
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log(ctx); // We can directly access cached version of ctx
+  console.log(ctx);
 }
 ```
 
-This is not always an elegant and easy for making a variable and passing it around. Afterall this is purpose of unctx to make sure context magically available everywhere in composables!
+This is not always an elegant and easy way by making a variable and passing it around. Afterall this is tbe purpose of unctx to make sure context is magically available everywhere in composables!
 
 ### Native Async Hooks
 
@@ -176,6 +161,24 @@ const setup = withAsyncContext(async () => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   console.log(useAwesome()); // Still returns context with dark magic!
 });
+```
+
+## Singleton Pattern
+
+If you are sure it is safe to use a shared instance (not depending to request), you can also use `ctx.set` and `ctx.unset` for a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
+
+**Note:** You cannot combine `set` with `call`. Always use `unset` before replacing instance otherwise you will get `Context conflict` error.
+
+```js
+import { createContext } from "unctx";
+
+const ctx = createContext();
+ctx.set(new Awesome());
+
+// Replacing instance without unset
+// ctx.set(new Awesome(), true)
+
+export const useAwesome = ctx.use;
 ```
 
 ## Under the hood
