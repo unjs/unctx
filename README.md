@@ -23,40 +23,63 @@ npm install unctx
 ```
 
 ```js
-import { createContext } from 'unctx'
+import { createContext } from "unctx";
 
-const ctx = createContext()
+const ctx = createContext();
 
-export const useAwesome = ctx.use
+export const useAwesome = ctx.use;
 
 // ...
 ctx.call({ test: 1 }, () => {
   // This is similar to vue setup function
   // Any function called here, can use `useAwesome` to get { test: 1 }
-})
+});
 ```
 
 User code:
 
 ```js
-import { useAwesome } from 'awesome-lib'
+import { useAwesome } from "awesome-lib";
 
 // ...
 function setup() {
-  const ctx = useAwesome()
+  const ctx = useAwesome();
 }
 ```
 
 **Note:** when no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
+
+## Async Hooks
+
+Unctx supports [AsyncLocalStorage](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve async contexts without need of code transform for async support. To enable this mode, you need to set `asyncHooks: true` and also provide an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+
+(See also [tc39 proposal](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/))
+
+```ts
+import { createContext } from "unctx";
+import { AsyncLocalStorage } from "node:async_hooks";
+
+const ctx = createContext({
+  asyncHooks: true,
+  AsyncLocalStorage,
+});
+
+ctx.call("123", () => {
+  setTimeout(() => {
+    // Prints 123
+    console.log(ctx.use());
+  }, 100);
+});
+```
 
 ## Using Namespaces
 
 To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
 
 ```js
-import { useContext, getContext } from 'unctx'
+import { useContext, getContext } from "unctx";
 
-const useAwesome = useContext('awesome-lib')
+const useAwesome = useContext("awesome-lib");
 
 // or
 // const awesomeContext = getContext('awesome-lib')
@@ -71,15 +94,15 @@ If you are sure it is safe to use a shared instance (not depending to request), 
 **Note:** You cannot combine `set` with `call`. Always use `unset` before replacing instance otherwise you will get `Context conflict` error.
 
 ```js
-import { createContext } from 'unctx'
+import { createContext } from "unctx";
 
-const ctx = createContext()
-ctx.set(new Awesome())
+const ctx = createContext();
+ctx.set(new Awesome());
 
 // Replacing instance without unset
 // ctx.set(new Awesome(), true)
 
-export const useAwesome = ctx.use
+export const useAwesome = ctx.use;
 ```
 
 ## TypeScript
@@ -88,7 +111,7 @@ A generic type exists on all utilities to be set for instance/context type:
 
 ```ts
 // Return type of useAwesome is Awesome | null
-const { use: useAwesome } = createContext<Awesome>()
+const { use: useAwesome } = createContext<Awesome>();
 ```
 
 ## Async Context
@@ -97,9 +120,9 @@ Normally, using context is only possible before first await statement:
 
 ```js
 async function setup() {
-  console.log(useAwesome()) // Returns context
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  console.log(useAwesome()) // Returns null
+  console.log(useAwesome()); // Returns context
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log(useAwesome()); // Returns null
 }
 ```
 
@@ -107,9 +130,9 @@ A simple workaround, is caching context before first await and use it directly:
 
 ```js
 async function setup() {
-  const ctx = useAwesome()
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  console.log(ctx) // We can directly access cached version of ctx
+  const ctx = useAwesome();
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log(ctx); // We can directly access cached version of ctx
 }
 ```
 
@@ -120,37 +143,37 @@ Unctx provides a better solution that transforms async to automatically restore 
 Import and register transform plugin:
 
 ```js
-import { unctxPlugin } from 'unctx/plugin'
+import { unctxPlugin } from "unctx/plugin";
 
 // Rollup
 // TODO: Add to rollup configuration
-unctxPlugin.rollup()
+unctxPlugin.rollup();
 
 // Vite
 // TODO: Add to vite configuration
-unctxPlugin.vite()
+unctxPlugin.vite();
 
 // Webpack
 // TODO: Add to webpack configuration
-unctxPlugin.webpack()
+unctxPlugin.webpack();
 ```
 
 Use `ctx.callAsync` instead of `ctx.call`:
 
 ```js
-await ctx.callAsync('test', setup)
+await ctx.callAsync("test", setup);
 ```
 
 Any async function that requires context, should be wrapped with `withAsyncContext`:
 
 ```js
-import { withAsyncContext } from 'unctx'
+import { withAsyncContext } from "unctx";
 
 const setup = withAsyncContext(async () => {
-  console.log(useAwesome()) // Returns context
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  console.log(useAwesome()) // Still returns context with dark magic!
-})
+  console.log(useAwesome()); // Returns context
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log(useAwesome()); // Still returns context with dark magic!
+});
 ```
 
 ## Under the hood
@@ -173,8 +196,8 @@ For instance this makes an error:
 ctx.call({ test: 1 }, () => {
   ctx.call({ test: 2 }, () => {
     // Throws error!
-  })
-})
+  });
+});
 ```
 
 ## License
@@ -182,17 +205,14 @@ ctx.call({ test: 1 }, () => {
 MIT. Made with 💖
 
 <!-- Refs -->
+
 [npm-v-src]: https://flat.badgen.net/npm/v/unctx/latest
 [npm-v-href]: https://npmjs.com/package/unctx
-
 [npm-dm-src]: https://flat.badgen.net/npm/dm/unctx
 [npm-dm-href]: https://npmjs.com/package/unctx
-
 [packagephobia-src]: https://flat.badgen.net/packagephobia/install/unctx
 [packagephobia-href]: https://packagephobia.now.sh/result?p=unctx
-
 [bundlephobia-src]: https://flat.badgen.net/bundlephobia/min/unctx
 [bundlephobia-href]: https://bundlephobia.com/result?p=unctx
-
 [codecov-src]: https://flat.badgen.net/codecov/c/github/unjs/unctx/master
 [codecov-href]: https://codecov.io/gh/unjs/unctx

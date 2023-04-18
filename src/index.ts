@@ -1,3 +1,5 @@
+import type { AsyncLocalStorage } from "node:async_hooks";
+
 export interface UseContext<T> {
   /**
    * Get the current context. Throws if no context is set.
@@ -29,7 +31,14 @@ export interface UseContext<T> {
 type OnAsyncRestore = () => void;
 type OnAsyncLeave = () => void | OnAsyncRestore;
 
-export function createContext<T = any>(): UseContext<T> {
+export interface ContextOptions {
+  asyncHooks?: boolean;
+  AsyncLocalStorage?: typeof AsyncLocalStorage;
+}
+
+export function createContext<T = any>(
+  opts: ContextOptions = {}
+): UseContext<T> {
   let currentInstance: T;
   let isSingleton = false;
 
@@ -39,15 +48,38 @@ export function createContext<T = any>(): UseContext<T> {
     }
   };
 
+  // Async hooks support
+  let als: AsyncLocalStorage<any>;
+  if (opts.asyncHooks) {
+    const _AsyncLocalStorage: typeof AsyncLocalStorage<any> =
+      opts.AsyncLocalStorage || globalThis.AsyncLocalStorage;
+    if (_AsyncLocalStorage) {
+      als = new _AsyncLocalStorage();
+    } else {
+      console.warn('[unctx] "AsyncLocalStorage" is not available!');
+    }
+  }
+
+  const _getCurrentInstance = () => {
+    if (als && currentInstance === undefined) {
+      const instance = als.getStore();
+      if (instance !== undefined) {
+        return instance;
+      }
+    }
+    return currentInstance;
+  };
+
   return {
     use: () => {
-      if (currentInstance === undefined) {
+      const _instance = _getCurrentInstance();
+      if (_instance === undefined) {
         throw new Error("Context is not available");
       }
-      return currentInstance;
+      return _instance;
     },
     tryUse: () => {
-      return currentInstance;
+      return _getCurrentInstance();
     },
     set: (instance: T, replace?: boolean) => {
       if (!replace) {
@@ -64,7 +96,7 @@ export function createContext<T = any>(): UseContext<T> {
       checkConflict(instance);
       currentInstance = instance;
       try {
-        return callback();
+        return als ? als.run(instance, callback) : callback();
       } finally {
         if (!isSingleton) {
           currentInstance = undefined;
@@ -80,7 +112,7 @@ export function createContext<T = any>(): UseContext<T> {
         currentInstance === instance ? onRestore : undefined;
       asyncHandlers.add(onLeave);
       try {
-        const r = callback();
+        const r = als ? als.run(instance, callback) : callback();
         if (!isSingleton) {
           currentInstance = undefined;
         }
@@ -93,16 +125,16 @@ export function createContext<T = any>(): UseContext<T> {
 }
 
 export interface ContextNamespace {
-  get: <T>(key: string) => UseContext<T>;
+  get: <T>(key: string, opts?: ContextOptions) => UseContext<T>;
 }
 
-export function createNamespace<T = any>() {
+export function createNamespace<T = any>(defaultOpts: ContextOptions = {}) {
   const contexts: Record<string, UseContext<T>> = {};
 
   return {
-    get(key) {
+    get(key, opts: ContextOptions = {}) {
       if (!contexts[key]) {
-        contexts[key] = createContext();
+        contexts[key] = createContext({ ...defaultOpts, ...opts });
       }
       contexts[key] as UseContext<T>;
       return contexts[key];
@@ -129,9 +161,11 @@ const globalKey = "__unctx__";
 export const defaultNamespace: ContextNamespace =
   _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace());
 
-export const getContext = <T>(key: string) => defaultNamespace.get<T>(key);
+export const getContext = <T>(key: string, opts: ContextOptions = {}) =>
+  defaultNamespace.get<T>(key, opts);
 
-export const useContext = <T>(key: string) => getContext<T>(key).use;
+export const useContext = <T>(key: string, opts: ContextOptions = {}) =>
+  getContext<T>(key, opts).use;
 
 const asyncHandlersKey = "__unctx_async_handlers__";
 const asyncHandlers: Set<OnAsyncLeave> =
