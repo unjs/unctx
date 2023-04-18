@@ -12,7 +12,7 @@
 
 [Vue.js](https://vuejs.org) introduced an amazing pattern called [Composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that allows organizing complex logic by splitting it into reusable functions and grouping in logical order. `unctx` allows easily implementing composition api pattern in your javascript libraries without hassle.
 
-## Integration
+## Usage
 
 In your **awesome** library:
 
@@ -49,7 +49,7 @@ function setup() {
 
 **Note:** when no context is presented `ctx.use` will throw an error. Use `ctx.tryUse` for tolerant usages (return nullable context).
 
-## Using Namespaces
+### Using Namespaces
 
 To avoid issues with multiple version of library, `unctx` provides a safe global namespace to access context by key (kept in [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis)). **Important:** Please use a verbose name for key to avoid conflict with other js libraries. Using npm package name is recommended. Using symbols has no effect since it still causes multiple context issue.
 
@@ -63,15 +63,6 @@ const useAwesome = useContext("awesome-lib");
 ```
 
 You can also create your own internal namespace with `createNamespace` utility for more advanced use cases.
-
-## TypeScript
-
-A generic type exists on all utilities to be set for instance/context type:
-
-```ts
-// Return type of useAwesome is Awesome | null
-const { use: useAwesome } = createContext<Awesome>();
-```
 
 ## Async Context
 
@@ -179,6 +170,15 @@ ctx.set(new Awesome());
 // ctx.set(new Awesome(), true)
 
 export const useAwesome = ctx.use;
+```
+
+## Typed Context
+
+A generic type exists on all utilities to be set for instance/context type for typescript support.
+
+```ts
+// Return type of useAwesome is Awesome | null
+const { use: useAwesome } = createContext<Awesome>();
 ```
 
 ## Under the hood
