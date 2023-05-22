@@ -176,8 +176,11 @@ export function createTransformer(options: TransformerOptions = {}) {
     function injectForNode(node: AwaitExpression, parent: Node | undefined) {
       const isStatement = parent?.type === "ExpressionStatement";
 
+      s.remove(toIndex(node.loc.start), toIndex(node.argument.loc.start))
+      s.remove(toIndex(node.loc.end), toIndex(node.argument.loc.end))
+
       s.appendLeft(
-        toIndex(node.loc.start),
+        toIndex(node.argument.loc.start),
         isStatement
           ? `;(([__temp,__restore]=__executeAsync(()=>`
           : `(([__temp,__restore]=__executeAsync(()=>`
