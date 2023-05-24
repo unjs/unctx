@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.3.1
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.3.0...v2.3.1)
+
+
+### 🩹 Fixes
+
+  - **transform:** Insert code rather than overwriting chunk ([#77](https://github.com/unjs/unctx/pull/77))
+
+### 🏡 Chore
+
+  - Update eslint ([0051af6](https://github.com/unjs/unctx/commit/0051af6))
+
+### ❤️  Contributors
+
+- Daniel Roe <daniel@roe.dev>
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+
 ## v2.3.0
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.2.0...v2.3.0)
