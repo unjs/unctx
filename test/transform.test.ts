@@ -167,7 +167,7 @@ describe("transforms", () => {
     ).toBeUndefined();
   });
 
-  it("does not transform nested functions", () => {
+  it("does not transform unrelated nested functions", () => {
     expect(
       transform(`
       export default withAsyncContext(async () => {
@@ -181,6 +181,50 @@ describe("transforms", () => {
       })
     `)
     ).toBeUndefined();
+  });
+
+  it("transforms validly nested functions", () => {
+    expect(
+      transform(`
+      export default withAsyncContext(async () => {
+        await something()
+
+        withAsyncContext(async () => {
+          await something()
+        })
+
+        const ctx = useSomething()
+      })
+    `)
+    ).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default withAsyncContext(async () => {let __temp, __restore;
+        ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+
+        withAsyncContext(async () => {let __temp, __restore;
+          ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore());
+        },1)
+
+        const ctx = useSomething()
+      },1)
+      "
+    `);
+  });
+
+  it("transforms multiple awaits in same chunk", () => {
+    expect(
+      transform(`
+      export default withAsyncContext(async () => {
+        await writeConfig(await readConfig())
+      })
+    `)
+    ).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default withAsyncContext(async () => {let __temp, __restore;
+        ;(([__temp,__restore]=__executeAsync(()=>writeConfig((([__temp,__restore]=__executeAsync(()=>readConfig())),__temp=await __temp,__restore(),__temp)))),await __temp,__restore());
+      },1)
+      "
+    `);
   });
 
   it("does not transform non target function", () => {

@@ -174,19 +174,22 @@ export function createTransformer(options: TransformerOptions = {}) {
     }
 
     function injectForNode(node: AwaitExpression, parent: Node | undefined) {
-      const body = code.slice(
-        toIndex(node.argument.loc.start),
-        toIndex(node.argument.loc.end)
-      );
-
       const isStatement = parent?.type === "ExpressionStatement";
 
-      s.overwrite(
-        toIndex(node.loc.start),
-        toIndex(node.loc.end),
+      s.remove(toIndex(node.loc.start), toIndex(node.argument.loc.start));
+      s.remove(toIndex(node.loc.end), toIndex(node.argument.loc.end));
+
+      s.appendLeft(
+        toIndex(node.argument.loc.start),
         isStatement
-          ? `;(([__temp,__restore]=__executeAsync(()=>${body})),await __temp,__restore());`
-          : `(([__temp,__restore]=__executeAsync(()=>${body})),__temp=await __temp,__restore(),__temp)`
+          ? `;(([__temp,__restore]=__executeAsync(()=>`
+          : `(([__temp,__restore]=__executeAsync(()=>`
+      );
+      s.appendRight(
+        toIndex(node.argument.loc.end),
+        isStatement
+          ? `)),await __temp,__restore());`
+          : `)),__temp=await __temp,__restore(),__temp)`
       );
     }
   }
