@@ -211,6 +211,22 @@ describe("transforms", () => {
     `);
   });
 
+  it("transforms multiple awaits in same chunk", () => {
+    expect(
+      transform(`
+      export default withAsyncContext(async () => {
+        await writeConfig(await readConfig())
+      })
+    `)
+    ).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default withAsyncContext(async () => {let __temp, __restore;
+        ;(([__temp,__restore]=__executeAsync(()=>writeConfig((([__temp,__restore]=__executeAsync(()=>readConfig())),__temp=await __temp,__restore(),__temp)))),await __temp,__restore());
+      },1)
+      "
+    `);
+  });
+
   it("does not transform non target function", () => {
     expect(
       transform(`
