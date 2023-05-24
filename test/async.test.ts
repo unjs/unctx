@@ -103,7 +103,7 @@ describe("callAsync", () => {
       expect(context.use()).toBe("A");
       await noop();
       expect(context.use()).toBe("A");
-      await "A";
+      await Promise.resolve();
       expect(context.use()).toBe("A");
       return context.use();
     });
