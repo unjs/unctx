@@ -9,7 +9,7 @@ export const unctxPlugin = createUnplugin(
   (options: UnctxPluginOptions = {}) => {
     const transformer = createTransformer(options);
     return {
-      name: "unctx:transfrom",
+      name: "unctx:transform",
       enforce: "post",
       transformInclude: options.transformInclude,
       transform(code, id) {
