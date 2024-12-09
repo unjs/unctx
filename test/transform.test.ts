@@ -302,4 +302,19 @@ describe("transforms", () => {
     `)
     ).toBeUndefined();
   });
+  it("Should not add a statement terminator if expression comes after if statement", () => {
+    expect(
+      transform(`
+      export default withAsyncContext(async () => {
+        if(false) await something()
+      })
+    `)
+    ).toMatchInlineSnapshot( `
+      "import { executeAsync as __executeAsync } from \\"unctx\\";
+      export default withAsyncContext(async () => {let __temp, __restore;
+        if(false) (([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp)
+      },1)
+      "
+    `);
+  });
 });

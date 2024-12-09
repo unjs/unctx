@@ -33,6 +33,10 @@ export interface TransformerOptions {
   objectDefinitions?: Record<string, string[]>;
 }
 
+type MaybeHandledNode = Node & {
+  __injected?: boolean;
+}
+
 export function createTransformer(options: TransformerOptions = {}) {
   options = {
     asyncFunctions: ["withAsyncContext"],
@@ -145,11 +149,16 @@ export function createTransformer(options: TransformerOptions = {}) {
 
       let injectVariable = false;
       walk(body, {
-        enter(node: Node, parent: Node | undefined) {
-          if (node.type === "AwaitExpression") {
+        enter(node: MaybeHandledNode, parent: MaybeHandledNode | undefined) {
+          if (node.type === "AwaitExpression" && !node.__injected) {
             detected = true;
             injectVariable = true;
             injectForNode(node, parent);
+          } else if(node.type === 'IfStatement' && node.consequent.type === 'ExpressionStatement' && node.consequent.expression.type === 'AwaitExpression') {
+            detected = true;
+            injectVariable = true;
+            (node.consequent.expression as MaybeHandledNode).__injected = true;
+            injectForNode(node.consequent.expression, node);
           }
           // Skip transform for nested functions
           if (
