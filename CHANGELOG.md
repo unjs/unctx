@@ -2,6 +2,48 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.4.0
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.3.1...v2.4.0)
+
+### 🚀 Enhancements
+
+- Update unplugin to v2 ([64574e6](https://github.com/unjs/unctx/commit/64574e6))
+
+### 🩹 Fixes
+
+- **transform:** Don't terminate single if statements ([#97](https://github.com/unjs/unctx/pull/97))
+
+### 💅 Refactors
+
+- Strict typechecks ([4a5a4d1](https://github.com/unjs/unctx/commit/4a5a4d1))
+
+### 📖 Documentation
+
+- Add note about adding `callAsync` to `asyncFunctions` ([#94](https://github.com/unjs/unctx/pull/94))
+
+### 🏡 Chore
+
+- Fix plugin name ([#89](https://github.com/unjs/unctx/pull/89))
+- Update dependencies ([c3329ce](https://github.com/unjs/unctx/commit/c3329ce))
+- Update eslint config ([2a45357](https://github.com/unjs/unctx/commit/2a45357))
+- Lint ([59accd6](https://github.com/unjs/unctx/commit/59accd6))
+- Update ci ([4523c80](https://github.com/unjs/unctx/commit/4523c80))
+- Fix ts issue ([d890610](https://github.com/unjs/unctx/commit/d890610))
+- Add autofix ci ([86d506d](https://github.com/unjs/unctx/commit/86d506d))
+- Lint ([6302fc3](https://github.com/unjs/unctx/commit/6302fc3))
+
+### ✅ Tests
+
+- Update snapshots ([c49cfc2](https://github.com/unjs/unctx/commit/c49cfc2))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Julien Huang ([@huang-julien](http://github.com/huang-julien))
+- Shoma-mano ([@shoma-mano](http://github.com/shoma-mano))
+- Xjccc ([@xjccc](http://github.com/xjccc))
+
 ## v2.3.1
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.3.0...v2.3.1)
