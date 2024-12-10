@@ -51,14 +51,14 @@ describe("callAsync", () => {
         expect(context.use()).toBe("A");
         await sleep(1);
         expect(context.use()).toBe("A");
-      })
+      }),
     );
   });
 
   it("withAsyncContext + try/catch", async () => {
     const context = createContext();
     const _callAsync = context.callAsync; // Skip transform
-    // eslint-disable-next-line unicorn/consistent-function-scoping
+
     const promise = async () => {
       await sleep(1);
       throw new Error("error");
@@ -69,9 +69,11 @@ describe("callAsync", () => {
         expect(context.use()).toBe("A");
         try {
           await promise();
-        } catch {}
+        } catch {
+          // ignore
+        }
         expect(context.use()).toBe("A");
-      })
+      }),
     );
   });
 
@@ -79,9 +81,9 @@ describe("callAsync", () => {
     const context = createContext();
     const _callAsync = context.callAsync; // Skip transform
     const _withAsyncContext = withAsyncContext;
-    // eslint-disable-next-line no-console
+
     const _warn = console.warn;
-    // eslint-disable-next-line no-console
+
     console.warn = vi.fn();
     await _callAsync(
       "A",
@@ -89,11 +91,11 @@ describe("callAsync", () => {
         expect(context.use()).toBe("A");
         await sleep(1);
         expect(context.tryUse()).toBe(undefined);
-      })
+      }),
     );
-    // eslint-disable-next-line no-console
+
     expect(console.warn).toHaveBeenCalledOnce();
-    // eslint-disable-next-line no-console
+
     console.warn = _warn;
   });
 

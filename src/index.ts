@@ -37,7 +37,7 @@ export interface ContextOptions {
 }
 
 export function createContext<T = any>(
-  opts: ContextOptions = {}
+  opts: ContextOptions = {},
 ): UseContext<T> {
   let currentInstance: T;
   let isSingleton = false;
@@ -136,8 +136,7 @@ export function createNamespace<T = any>(defaultOpts: ContextOptions = {}) {
       if (!contexts[key]) {
         contexts[key] = createContext({ ...defaultOpts, ...opts });
       }
-      contexts[key] as UseContext<T>;
-      return contexts[key];
+      return contexts[key] as UseContext<T>;
     },
   };
 }
@@ -147,12 +146,12 @@ const _globalThis = (
   typeof globalThis !== "undefined"
     ? globalThis
     : typeof self !== "undefined"
-    ? self
-    : typeof global !== "undefined"
-    ? global
-    : typeof window !== "undefined"
-    ? window
-    : {}
+      ? self
+      : typeof global !== "undefined"
+        ? global
+        : typeof window !== "undefined"
+          ? window
+          : {}
 ) as typeof globalThis;
 /* eslint-enable */
 
@@ -174,7 +173,7 @@ const asyncHandlers: Set<OnAsyncLeave> =
 type AsyncFunction<T> = () => Promise<T>;
 
 export function executeAsync<T>(
-  function_: AsyncFunction<T>
+  function_: AsyncFunction<T>,
 ): [Promise<T>, () => void] {
   const restores: OnAsyncRestore[] = [];
   for (const leaveHandler of asyncHandlers) {
@@ -200,15 +199,14 @@ export function executeAsync<T>(
 
 export function withAsyncContext<T = any>(
   function_: AsyncFunction<T>,
-  transformed?: boolean
+  transformed?: boolean,
 ): AsyncFunction<T> {
   if (!transformed) {
-    // eslint-disable-next-line no-console
     console.warn(
       "[unctx] `withAsyncContext` needs transformation for async context support in",
       function_,
       "\n",
-      function_.toString()
+      function_.toString(),
     );
   }
   return function_;

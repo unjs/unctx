@@ -46,8 +46,8 @@ export function createTransformer(options: TransformerOptions = {}) {
 
   const matchRE = new RegExp(
     `\\b(${[...options.asyncFunctions, ...objectDefinitionFunctions].join(
-      "|"
-    )})\\(`
+      "|",
+    )})\\(`,
   );
 
   function shouldTransform(code: string) {
@@ -98,7 +98,7 @@ export function createTransformer(options: TransformerOptions = {}) {
 
                 if (
                   options.objectDefinitions[functionName].includes(
-                    property.key?.name
+                    property.key?.name,
                   )
                 ) {
                   transformFunctionBody(property.value);
@@ -116,7 +116,7 @@ export function createTransformer(options: TransformerOptions = {}) {
 
     s.appendLeft(
       0,
-      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`
+      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`,
     );
 
     return {
@@ -183,13 +183,13 @@ export function createTransformer(options: TransformerOptions = {}) {
         toIndex(node.argument.loc.start),
         isStatement
           ? `;(([__temp,__restore]=__executeAsync(()=>`
-          : `(([__temp,__restore]=__executeAsync(()=>`
+          : `(([__temp,__restore]=__executeAsync(()=>`,
       );
       s.appendRight(
         toIndex(node.argument.loc.end),
         isStatement
           ? `)),await __temp,__restore());`
-          : `)),__temp=await __temp,__restore(),__temp)`
+          : `)),__temp=await __temp,__restore(),__temp)`,
       );
     }
   }

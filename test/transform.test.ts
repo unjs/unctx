@@ -15,7 +15,7 @@ describe("transforms", () => {
       input
         .split("\n")
         .map((index) => index.slice(6))
-        .join("\n")
+        .join("\n"),
     )?.code;
   }
 
@@ -27,7 +27,7 @@ describe("transforms", () => {
         await something()
         const ctx2 = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -47,7 +47,7 @@ describe("transforms", () => {
         const bar = hello(await something())
         const ctx = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -70,7 +70,7 @@ describe("transforms", () => {
         }
         const ctx = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -100,7 +100,7 @@ describe("transforms", () => {
         if (!user)
           return navigateTo('/');
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -127,7 +127,7 @@ describe("transforms", () => {
         await something()
         const ctx2 = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default ctx.callAsync(async () => {let __temp, __restore;
@@ -145,7 +145,7 @@ describe("transforms", () => {
         await something()
         const ctx2 = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default x.ctx.callAsync(async () => {let __temp, __restore;
@@ -163,7 +163,7 @@ describe("transforms", () => {
       export default withAsyncContext(async () => {
         const ctx = useSomething()
       })
-    `)
+    `),
     ).toBeUndefined();
   });
 
@@ -179,7 +179,7 @@ describe("transforms", () => {
         }
         const ctx = useSomething()
       })
-    `)
+    `),
     ).toBeUndefined();
   });
 
@@ -195,7 +195,7 @@ describe("transforms", () => {
 
         const ctx = useSomething()
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -217,7 +217,7 @@ describe("transforms", () => {
       export default withAsyncContext(async () => {
         await writeConfig(await readConfig())
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default withAsyncContext(async () => {let __temp, __restore;
@@ -235,7 +235,7 @@ describe("transforms", () => {
         await something()
         const ctx2 = useSomething()
       })
-    `)
+    `),
     ).toBeUndefined();
   });
 
@@ -265,7 +265,7 @@ describe("transforms", () => {
           const ctx2 = useSomething()
         }
       })
-    `)
+    `),
     ).toMatchInlineSnapshot(`
       "import { executeAsync as __executeAsync } from \\"unctx\\";
       export default defineSomething({
@@ -299,7 +299,7 @@ describe("transforms", () => {
     expect(
       transform(`
       export default defineSomething('test')
-    `)
+    `),
     ).toBeUndefined();
   });
 });
