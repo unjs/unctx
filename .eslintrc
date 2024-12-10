@@ -1,9 +1,0 @@
-{
-  "extends": [
-    "eslint-config-unjs"
-  ],
-  "rules": {
-    "unicorn/no-abusive-eslint-disable": 0,
-    "unicorn/prefer-at": 0
-  }
-}

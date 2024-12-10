@@ -37,12 +37,12 @@ export interface ContextOptions {
 }
 
 export function createContext<T = any>(
-  opts: ContextOptions = {}
+  opts: ContextOptions = {},
 ): UseContext<T> {
-  let currentInstance: T;
+  let currentInstance: T | undefined;
   let isSingleton = false;
 
-  const checkConflict = (instance: T) => {
+  const checkConflict = (instance: T | undefined) => {
     if (currentInstance && currentInstance !== instance) {
       throw new Error("Context conflict");
     }
@@ -52,7 +52,7 @@ export function createContext<T = any>(
   let als: AsyncLocalStorage<any>;
   if (opts.asyncContext) {
     const _AsyncLocalStorage: typeof AsyncLocalStorage<any> =
-      opts.AsyncLocalStorage || globalThis.AsyncLocalStorage;
+      opts.AsyncLocalStorage || (globalThis as any).AsyncLocalStorage;
     if (_AsyncLocalStorage) {
       als = new _AsyncLocalStorage();
     } else {
@@ -81,7 +81,7 @@ export function createContext<T = any>(
     tryUse: () => {
       return _getCurrentInstance();
     },
-    set: (instance: T, replace?: boolean) => {
+    set: (instance: T | undefined, replace?: boolean) => {
       if (!replace) {
         checkConflict(instance);
       }
@@ -132,12 +132,11 @@ export function createNamespace<T = any>(defaultOpts: ContextOptions = {}) {
   const contexts: Record<string, UseContext<T>> = {};
 
   return {
-    get(key, opts: ContextOptions = {}) {
+    get(key: string, opts: ContextOptions = {}) {
       if (!contexts[key]) {
         contexts[key] = createContext({ ...defaultOpts, ...opts });
       }
-      contexts[key] as UseContext<T>;
-      return contexts[key];
+      return contexts[key] as UseContext<T>;
     },
   };
 }
@@ -147,19 +146,20 @@ const _globalThis = (
   typeof globalThis !== "undefined"
     ? globalThis
     : typeof self !== "undefined"
-    ? self
-    : typeof global !== "undefined"
-    ? global
-    : typeof window !== "undefined"
-    ? window
-    : {}
+      ? self
+      : typeof global !== "undefined"
+        ? global
+        : typeof window !== "undefined"
+          ? window
+          : {}
 ) as typeof globalThis;
 /* eslint-enable */
 
 const globalKey = "__unctx__";
 
 export const defaultNamespace: ContextNamespace =
-  _globalThis[globalKey] || (_globalThis[globalKey] = createNamespace());
+  (_globalThis as any)[globalKey] ||
+  ((_globalThis as any)[globalKey] = createNamespace());
 
 export const getContext = <T>(key: string, opts: ContextOptions = {}) =>
   defaultNamespace.get<T>(key, opts);
@@ -169,12 +169,13 @@ export const useContext = <T>(key: string, opts: ContextOptions = {}) =>
 
 const asyncHandlersKey = "__unctx_async_handlers__";
 const asyncHandlers: Set<OnAsyncLeave> =
-  _globalThis[asyncHandlersKey] || (_globalThis[asyncHandlersKey] = new Set());
+  (_globalThis as any)[asyncHandlersKey] ||
+  ((_globalThis as any)[asyncHandlersKey] = new Set());
 
 type AsyncFunction<T> = () => Promise<T>;
 
 export function executeAsync<T>(
-  function_: AsyncFunction<T>
+  function_: AsyncFunction<T>,
 ): [Promise<T>, () => void] {
   const restores: OnAsyncRestore[] = [];
   for (const leaveHandler of asyncHandlers) {
@@ -200,15 +201,14 @@ export function executeAsync<T>(
 
 export function withAsyncContext<T = any>(
   function_: AsyncFunction<T>,
-  transformed?: boolean
+  transformed?: boolean,
 ): AsyncFunction<T> {
   if (!transformed) {
-    // eslint-disable-next-line no-console
     console.warn(
       "[unctx] `withAsyncContext` needs transformation for async context support in",
       function_,
       "\n",
-      function_.toString()
+      function_.toString(),
     );
   }
   return function_;

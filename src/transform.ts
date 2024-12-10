@@ -35,7 +35,7 @@ export interface TransformerOptions {
 
 type MaybeHandledNode = Node & {
   __injected?: boolean;
-}
+};
 
 export function createTransformer(options: TransformerOptions = {}) {
   options = {
@@ -46,12 +46,12 @@ export function createTransformer(options: TransformerOptions = {}) {
     ...options,
   };
 
-  const objectDefinitionFunctions = Object.keys(options.objectDefinitions);
+  const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 
   const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions, ...objectDefinitionFunctions].join(
-      "|"
-    )})\\(`
+    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
+      "|",
+    )})\\(`,
   );
 
   function shouldTransform(code: string) {
@@ -77,11 +77,11 @@ export function createTransformer(options: TransformerOptions = {}) {
       enter(node: Node) {
         if (node.type === "CallExpression") {
           const functionName = _getFunctionName(node.callee);
-          if (options.asyncFunctions.includes(functionName)) {
+          if (options.asyncFunctions!.includes(functionName)) {
             transformFunctionArguments(node);
             if (functionName !== "callAsync") {
               const lastArgument = node.arguments[node.arguments.length - 1];
-              if (lastArgument) {
+              if (lastArgument && lastArgument.loc) {
                 s.appendRight(toIndex(lastArgument.loc.end), ",1");
               }
             }
@@ -101,8 +101,8 @@ export function createTransformer(options: TransformerOptions = {}) {
                 }
 
                 if (
-                  options.objectDefinitions[functionName].includes(
-                    property.key?.name
+                  options.objectDefinitions![functionName]?.includes(
+                    property.key?.name,
                   )
                 ) {
                   transformFunctionBody(property.value);
@@ -120,7 +120,7 @@ export function createTransformer(options: TransformerOptions = {}) {
 
     s.appendLeft(
       0,
-      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`
+      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`,
     );
 
     return {
@@ -154,7 +154,20 @@ export function createTransformer(options: TransformerOptions = {}) {
             detected = true;
             injectVariable = true;
             injectForNode(node, parent);
-          } else if(node.type === 'IfStatement' && node.consequent.type === 'ExpressionStatement' && node.consequent.expression.type === 'AwaitExpression') {
+          } else if (
+            node.type === "IfStatement" &&
+            node.consequent.type === "ExpressionStatement" &&
+            node.consequent.expression.type === "AwaitExpression"
+          ) {
+            detected = true;
+            injectVariable = true;
+            (node.consequent.expression as MaybeHandledNode).__injected = true;
+            injectForNode(node.consequent.expression, node);
+          } else if (
+            node.type === "IfStatement" &&
+            node.consequent.type === "ExpressionStatement" &&
+            node.consequent.expression.type === "AwaitExpression"
+          ) {
             detected = true;
             injectVariable = true;
             (node.consequent.expression as MaybeHandledNode).__injected = true;
@@ -171,7 +184,7 @@ export function createTransformer(options: TransformerOptions = {}) {
         },
       });
 
-      if (injectVariable) {
+      if (injectVariable && body.loc) {
         s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
       }
     }
@@ -182,8 +195,15 @@ export function createTransformer(options: TransformerOptions = {}) {
       }
     }
 
-    function injectForNode(node: AwaitExpression, parent: Node | undefined) {
+    function injectForNode(
+      node: AwaitExpression,
+      parent: Node | undefined | null,
+    ) {
       const isStatement = parent?.type === "ExpressionStatement";
+
+      if (!node.loc || !node.argument.loc) {
+        return;
+      }
 
       s.remove(toIndex(node.loc.start), toIndex(node.argument.loc.start));
       s.remove(toIndex(node.loc.end), toIndex(node.argument.loc.end));
@@ -192,13 +212,13 @@ export function createTransformer(options: TransformerOptions = {}) {
         toIndex(node.argument.loc.start),
         isStatement
           ? `;(([__temp,__restore]=__executeAsync(()=>`
-          : `(([__temp,__restore]=__executeAsync(()=>`
+          : `(([__temp,__restore]=__executeAsync(()=>`,
       );
       s.appendRight(
         toIndex(node.argument.loc.end),
         isStatement
           ? `)),await __temp,__restore());`
-          : `)),__temp=await __temp,__restore(),__temp)`
+          : `)),__temp=await __temp,__restore(),__temp)`,
       );
     }
   }
@@ -209,10 +229,11 @@ export function createTransformer(options: TransformerOptions = {}) {
   };
 }
 
-function _getFunctionName(node: Node) {
+function _getFunctionName(node: Node): string {
   if (node.type === "Identifier") {
     return node.name;
   } else if (node.type === "MemberExpression") {
     return _getFunctionName(node.property);
   }
+  return "";
 }
