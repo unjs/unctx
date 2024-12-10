@@ -13,7 +13,7 @@ export interface TransformerOptions {
   /**
    * The function names to be transformed.
    *
-   * @default ['withAsyncContext', 'callAsync']
+   * @default ['withAsyncContext']
    */
   asyncFunctions?: string[];
   /**

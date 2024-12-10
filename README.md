@@ -142,6 +142,8 @@ Use `ctx.callAsync` instead of `ctx.call`:
 await ctx.callAsync("test", setup);
 ```
 
+**_NOTE:_** `callAsync` is not transformed by default. You need to add it to the plugin's `asyncFunctions: []` option to transform it.
+
 Any async function that requires context, should be wrapped with `withAsyncContext`:
 
 ```js
