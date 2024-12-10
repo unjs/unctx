@@ -7,7 +7,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 describe("Async context", () => {
   it("AsyncLocalStorage works", async () => {
     const asl = new AsyncLocalStorage<string>();
-    let _ctxInstance: string;
+    let _ctxInstance: string | undefined;
     await new Promise<void>((resolve) => {
       asl.run("A", () => {
         setTimeout(() => {

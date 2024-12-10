@@ -1,5 +1,5 @@
 import { createUnplugin } from "unplugin";
-import { createTransformer, TransformerOptions } from "./transform";
+import { createTransformer, type TransformerOptions } from "./transform";
 
 export interface UnctxPluginOptions extends TransformerOptions {
   transformInclude?: (id: string) => boolean;

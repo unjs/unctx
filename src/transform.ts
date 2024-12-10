@@ -42,10 +42,10 @@ export function createTransformer(options: TransformerOptions = {}) {
     ...options,
   };
 
-  const objectDefinitionFunctions = Object.keys(options.objectDefinitions);
+  const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 
   const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions, ...objectDefinitionFunctions].join(
+    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
       "|",
     )})\\(`,
   );
@@ -73,11 +73,11 @@ export function createTransformer(options: TransformerOptions = {}) {
       enter(node: Node) {
         if (node.type === "CallExpression") {
           const functionName = _getFunctionName(node.callee);
-          if (options.asyncFunctions.includes(functionName)) {
+          if (options.asyncFunctions!.includes(functionName)) {
             transformFunctionArguments(node);
             if (functionName !== "callAsync") {
               const lastArgument = node.arguments[node.arguments.length - 1];
-              if (lastArgument) {
+              if (lastArgument && lastArgument.loc) {
                 s.appendRight(toIndex(lastArgument.loc.end), ",1");
               }
             }
@@ -97,7 +97,7 @@ export function createTransformer(options: TransformerOptions = {}) {
                 }
 
                 if (
-                  options.objectDefinitions[functionName].includes(
+                  options.objectDefinitions![functionName]?.includes(
                     property.key?.name,
                   )
                 ) {
@@ -145,7 +145,7 @@ export function createTransformer(options: TransformerOptions = {}) {
 
       let injectVariable = false;
       walk(body, {
-        enter(node: Node, parent: Node | undefined) {
+        enter(node: Node, parent: Node | undefined | null) {
           if (node.type === "AwaitExpression") {
             detected = true;
             injectVariable = true;
@@ -162,7 +162,7 @@ export function createTransformer(options: TransformerOptions = {}) {
         },
       });
 
-      if (injectVariable) {
+      if (injectVariable && body.loc) {
         s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
       }
     }
@@ -173,8 +173,15 @@ export function createTransformer(options: TransformerOptions = {}) {
       }
     }
 
-    function injectForNode(node: AwaitExpression, parent: Node | undefined) {
+    function injectForNode(
+      node: AwaitExpression,
+      parent: Node | undefined | null,
+    ) {
       const isStatement = parent?.type === "ExpressionStatement";
+
+      if (!node.loc || !node.argument.loc) {
+        return;
+      }
 
       s.remove(toIndex(node.loc.start), toIndex(node.argument.loc.start));
       s.remove(toIndex(node.loc.end), toIndex(node.argument.loc.end));
@@ -200,10 +207,11 @@ export function createTransformer(options: TransformerOptions = {}) {
   };
 }
 
-function _getFunctionName(node: Node) {
+function _getFunctionName(node: Node): string {
   if (node.type === "Identifier") {
     return node.name;
   } else if (node.type === "MemberExpression") {
     return _getFunctionName(node.property);
   }
+  return "";
 }
