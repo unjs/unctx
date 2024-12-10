@@ -33,8 +33,10 @@ export interface TransformerOptions {
   objectDefinitions?: Record<string, string[]>;
 }
 
+const kInjected = "__unctx_injected__";
+
 type MaybeHandledNode = Node & {
-  __injected?: boolean;
+  [kInjected]?: boolean;
 };
 
 export function createTransformer(options: TransformerOptions = {}) {
@@ -150,7 +152,7 @@ export function createTransformer(options: TransformerOptions = {}) {
       let injectVariable = false;
       walk(body, {
         enter(node: MaybeHandledNode, parent: MaybeHandledNode | undefined) {
-          if (node.type === "AwaitExpression" && !node.__injected) {
+          if (node.type === "AwaitExpression" && !node[kInjected]) {
             detected = true;
             injectVariable = true;
             injectForNode(node, parent);
@@ -161,7 +163,7 @@ export function createTransformer(options: TransformerOptions = {}) {
           ) {
             detected = true;
             injectVariable = true;
-            (node.consequent.expression as MaybeHandledNode).__injected = true;
+            (node.consequent.expression as MaybeHandledNode)[kInjected] = true;
             injectForNode(node.consequent.expression, node);
           }
           // Skip transform for nested functions
