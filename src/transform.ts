@@ -163,15 +163,6 @@ export function createTransformer(options: TransformerOptions = {}) {
             injectVariable = true;
             (node.consequent.expression as MaybeHandledNode).__injected = true;
             injectForNode(node.consequent.expression, node);
-          } else if (
-            node.type === "IfStatement" &&
-            node.consequent.type === "ExpressionStatement" &&
-            node.consequent.expression.type === "AwaitExpression"
-          ) {
-            detected = true;
-            injectVariable = true;
-            (node.consequent.expression as MaybeHandledNode).__injected = true;
-            injectForNode(node.consequent.expression, node);
           }
           // Skip transform for nested functions
           if (
