@@ -48,7 +48,7 @@
     "acorn": "^8.14.0",
     "estree-walker": "^3.0.3",
     "magic-string": "^0.30.15",
-    "unplugin": "^1.16.0"
+    "unplugin": "^2.0.0"
   },
   "devDependencies": {
     "@types/estree": "^1.0.6",
