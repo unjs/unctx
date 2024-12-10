@@ -151,7 +151,10 @@ export function createTransformer(options: TransformerOptions = {}) {
 
       let injectVariable = false;
       walk(body, {
-        enter(node: MaybeHandledNode, parent: MaybeHandledNode | undefined) {
+        enter(
+          node: MaybeHandledNode,
+          parent: MaybeHandledNode | undefined | null,
+        ) {
           if (node.type === "AwaitExpression" && !node[kInjected]) {
             detected = true;
             injectVariable = true;
