@@ -61,7 +61,7 @@ export function createContext<T = any>(
   }
 
   const _getCurrentInstance = () => {
-    if (als && currentInstance === undefined) {
+    if (als) {
       const instance = als.getStore();
       if (instance !== undefined) {
         return instance;
