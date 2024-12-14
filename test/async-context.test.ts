@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { describe, it, expect } from "vitest";
-import { createContext } from "../src";
+import { createContext, executeAsync } from "../src";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -53,5 +53,34 @@ describe("Async context", () => {
     ]);
 
     expect(result).toEqual(["A", "B", "C"]);
+  });
+
+  it("Context from use match correct context", async () => {
+    const context = createContext({
+      asyncContext: true,
+      AsyncLocalStorage,
+    });
+
+    for (let i = 0; i < 10; i++) {
+      context.callAsync({ i }, async () => {
+        const contexts = new Set();
+
+        const runAsyncOpAndPushContext = async () => {
+          contexts.add(context.use());
+          // Use then to avoid code transformation
+          await sleep(1).then(() => {
+            contexts.add(context.use());
+          });
+        };
+
+        const [__temp, __restore] = executeAsync(() =>
+          runAsyncOpAndPushContext(),
+        );
+        await __temp;
+        __restore();
+
+        expect(contexts.size).toEqual(1);
+      });
+    }
   });
 });
