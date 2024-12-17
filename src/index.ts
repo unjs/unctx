@@ -61,7 +61,9 @@ export function createContext<T = any>(
   }
 
   const _getCurrentInstance = () => {
-    if (als && currentInstance === undefined) {
+    // TODO: Investigate better solution to make sure currentInstance is in sync with AsyncLocalStorage
+    // https://github.com/unjs/unctx/issues/100
+    if (als /* && currentInstance === undefined */) {
       const instance = als.getStore();
       if (instance !== undefined) {
         return instance;
