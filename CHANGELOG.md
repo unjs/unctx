@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.4.1
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.4.0...v2.4.1)
+
+### 🩹 Fixes
+
+- Prefer asyncContext instance over currentInstance ([#101](https://github.com/unjs/unctx/pull/101))
+
+### 🏡 Chore
+
+- Update deps ([ad0cfc7](https://github.com/unjs/unctx/commit/ad0cfc7))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](http://github.com/pi0))
+- Andrew Brandt ([@justsl](http://github.com/justsl))
+
 ## v2.4.0
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.3.1...v2.4.0)
