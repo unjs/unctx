@@ -12,20 +12,20 @@
       "require": "./dist/index.cjs"
     },
     "./transform": {
-      "types": "./dist/transform.d.ts",
-      "import": "./dist/transform.mjs"
+      "types": "./dist/transform/index.d.ts",
+      "import": "./dist/transform/index.mjs"
     },
-    "./transform-oxc": {
-      "types": "./dist/transform-oxc.d.ts",
-      "import": "./dist/transform-oxc.mjs"
+    "./transform/acorn": {
+      "types": "./dist/transform/acorn.d.ts",
+      "import": "./dist/transform/acorn.mjs"
+    },
+    "./transform/oxc": {
+      "types": "./dist/transform/oxc.d.ts",
+      "import": "./dist/transform/oxc.mjs"
     },
     "./plugin": {
       "types": "./dist/plugin.d.ts",
       "import": "./dist/plugin.mjs"
-    },
-    "./plugin-oxc": {
-      "types": "./dist/plugin-oxc.d.ts",
-      "import": "./dist/plugin-oxc.mjs"
     }
   },
   "main": "./dist/index.cjs",
