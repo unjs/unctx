@@ -1,3 +1,6 @@
+/**
+ * Based on transform.ts but uses oxc-parser and oxc-walker
+ */
 import { parseSync } from "oxc-parser";
 import MagicString from "magic-string";
 import { walk } from "oxc-walker";
