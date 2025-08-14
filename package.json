@@ -15,9 +15,17 @@
       "types": "./dist/transform.d.ts",
       "import": "./dist/transform.mjs"
     },
+    "./transform-oxc": {
+      "types": "./dist/transform-oxc.d.ts",
+      "import": "./dist/transform-oxc.mjs"
+    },
     "./plugin": {
       "types": "./dist/plugin.d.ts",
       "import": "./dist/plugin.mjs"
+    },
+    "./plugin-oxc": {
+      "types": "./dist/plugin-oxc.d.ts",
+      "import": "./dist/plugin-oxc.mjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -49,6 +57,10 @@
     "estree-walker": "^3.0.3",
     "magic-string": "^0.30.17",
     "unplugin": "^2.3.5"
+  },
+  "peerDependencies": {
+    "oxc-parser": "^0.82.1",
+    "oxc-walker": "^0.4.0"
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",

@@ -1,0 +1,29 @@
+import { createUnplugin } from "unplugin";
+import { createTransformer, type TransformerOptions } from "./transform-oxc";
+
+export interface UnctxPluginOptions extends TransformerOptions {
+  transformInclude?: (id: string) => boolean;
+}
+
+export const unctxOxcPlugin = createUnplugin(
+  (options: UnctxPluginOptions = {}) => {
+    const transformer = createTransformer(options);
+    return {
+      name: "unctx:transform",
+      enforce: "post",
+      transformInclude: options.transformInclude,
+      transform(code, id) {
+        const result = transformer.transform(code);
+        if (result) {
+          return {
+            code: result.code,
+            map: result.magicString.generateMap({
+              source: id,
+              includeContent: true,
+            }),
+          };
+        }
+      },
+    };
+  },
+);
