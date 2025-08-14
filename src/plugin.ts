@@ -1,7 +1,11 @@
 import { createUnplugin, type HookFilter } from "unplugin";
-import { createTransformer, type TransformerOptions } from "./transform";
+import { type TransformerOptions } from "./transform/index.js";
 
 export interface UnctxPluginOptions extends TransformerOptions {
+  /** The parser to use.
+   * @default 'acorn'
+   */
+  parser?: "acorn" | "oxc";
   /** Plugin Hook Filter for the transform hook
    * @see https://unplugin.unjs.io/guide/#filters
    */
@@ -10,17 +14,32 @@ export interface UnctxPluginOptions extends TransformerOptions {
   transformInclude?: (id: string) => boolean;
 }
 
+let transformer:
+  | ReturnType<typeof import("./transform/acorn.js").createTransformer>
+  | ReturnType<typeof import("./transform/oxc.js").createTransformer>
+  | undefined;
+async function loadCreateTransformerFn(options: UnctxPluginOptions) {
+  if (transformer) {
+    return;
+  }
+  const { createTransformer } =
+    !options.parser || options.parser === "acorn"
+      ? await import("./transform/acorn")
+      : await import("./transform/oxc");
+  transformer = createTransformer(options);
+}
+
 export const unctxPlugin = createUnplugin(
   (options: UnctxPluginOptions = {}) => {
-    const transformer = createTransformer(options);
     return {
       name: "unctx:transform",
       enforce: "post",
       transformInclude: options.transformInclude,
       transform: {
         filter: options.transformFilter,
-        handler(code, id) {
-          const result = transformer.transform(code);
+        async handler(code, id) {
+          await loadCreateTransformerFn(options);
+          const result = transformer!.transform(code);
           if (result) {
             return {
               code: result.code,
