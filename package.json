@@ -52,10 +52,10 @@
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",
-    "@types/node": "^24.3.0",
+    "@types/node": "^24.3.1",
     "@vitest/coverage-v8": "^3.2.4",
     "changelogen": "^0.6.2",
-    "eslint": "^9.34.0",
+    "eslint": "^9.35.0",
     "eslint-config-unjs": "^0.5.0",
     "jiti": "^2.5.1",
     "prettier": "^3.6.2",
