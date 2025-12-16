@@ -12,8 +12,16 @@
       "require": "./dist/index.cjs"
     },
     "./transform": {
-      "types": "./dist/transform.d.ts",
-      "import": "./dist/transform.mjs"
+      "types": "./dist/transform/index.d.ts",
+      "import": "./dist/transform/index.mjs"
+    },
+    "./transform/acorn": {
+      "types": "./dist/transform/acorn.d.ts",
+      "import": "./dist/transform/acorn.mjs"
+    },
+    "./transform/oxc": {
+      "types": "./dist/transform/oxc.d.ts",
+      "import": "./dist/transform/oxc.mjs"
     },
     "./plugin": {
       "types": "./dist/plugin.d.ts",
@@ -49,6 +57,10 @@
     "estree-walker": "^3.0.3",
     "magic-string": "^0.30.21",
     "unplugin": "^2.3.11"
+  },
+  "peerDependencies": {
+    "oxc-parser": "^0.82.1",
+    "oxc-walker": "^0.4.0"
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",

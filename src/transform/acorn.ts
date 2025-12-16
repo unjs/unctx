@@ -8,32 +8,11 @@ import type {
   AwaitExpression,
   Position,
 } from "estree";
-
-export interface TransformerOptions {
-  /**
-   * The function names to be transformed.
-   *
-   * @default ['withAsyncContext']
-   */
-  asyncFunctions?: string[];
-  /**
-   * @default 'unctx'
-   */
-  helperModule?: string;
-  /**
-   * @default 'executeAsync'
-   */
-  helperName?: string;
-  /**
-   * Whether to transform properties of an object defined with a helper function. For example,
-   * to transform key `middleware` within the object defined with function `defineMeta`, you would pass:
-   * `{ defineMeta: ['middleware'] }`.
-   * @default {}
-   */
-  objectDefinitions?: Record<string, string[]>;
-}
-
-const kInjected = "__unctx_injected__";
+import {
+  type TransformerOptions,
+  defaultTransformerOptions,
+  kInjected,
+} from "./_shared.js";
 
 type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
@@ -41,10 +20,7 @@ type MaybeHandledNode = Node & {
 
 export function createTransformer(options: TransformerOptions = {}) {
   options = {
-    asyncFunctions: ["withAsyncContext"],
-    helperModule: "unctx",
-    helperName: "executeAsync",
-    objectDefinitions: {},
+    ...defaultTransformerOptions(),
     ...options,
   };
 
