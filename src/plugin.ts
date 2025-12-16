@@ -1,5 +1,5 @@
 import { createUnplugin, type HookFilter } from "unplugin";
-import { type TransformerOptions } from "./transform/index.js";
+import { type TransformerOptions } from "./transform/_shared.js";
 
 export interface UnctxPluginOptions extends TransformerOptions {
   /** The parser to use.

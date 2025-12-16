@@ -14,7 +14,7 @@ import {
   defaultTransformerOptions,
   kInjected,
   type TransformerOptions,
-} from "./index.js";
+} from "./_shared";
 
 type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
@@ -22,7 +22,7 @@ type MaybeHandledNode = Node & {
 
 export function createTransformer(options: TransformerOptions = {}) {
   options = {
-    ...defaultTransformerOptions,
+    ...defaultTransformerOptions(),
     ...options,
   };
 

@@ -28,9 +28,10 @@ export type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
 };
 
-export const defaultTransformerOptions: TransformerOptions = {
-  asyncFunctions: ["withAsyncContext"],
-  helperModule: "unctx",
-  helperName: "executeAsync",
-  objectDefinitions: {},
-};
+export const defaultTransformerOptions = () =>
+  ({
+    asyncFunctions: ["withAsyncContext"],
+    helperModule: "unctx",
+    helperName: "executeAsync",
+    objectDefinitions: {},
+  }) satisfies TransformerOptions;
