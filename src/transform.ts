@@ -39,7 +39,16 @@ type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
 };
 
-export function createTransformer(options: TransformerOptions = {}) {
+export function createTransformer(options: TransformerOptions = {}): {
+  transform: (
+    code: string,
+    options?: { force?: false },
+  ) => { code: string; magicString: MagicString } | undefined;
+  filter: {
+    code: RegExp;
+  };
+  shouldTransform: (code: string) => boolean;
+} {
   options = {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
@@ -56,7 +65,7 @@ export function createTransformer(options: TransformerOptions = {}) {
     )})\\(`,
   );
 
-  function shouldTransform(code: string) {
+  function shouldTransform(code: string): boolean {
     return typeof code === "string" && matchRE.test(code);
   }
 
@@ -64,7 +73,10 @@ export function createTransformer(options: TransformerOptions = {}) {
     code: matchRE,
   };
 
-  function transform(code: string, options_: { force?: false } = {}) {
+  function transform(
+    code: string,
+    options_: { force?: false } = {},
+  ): { code: string; magicString: MagicString } | undefined {
     if (!options_.force && !shouldTransform(code)) {
       return;
     }

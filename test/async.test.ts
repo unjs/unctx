@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createContext, withAsyncContext } from "../src";
+import { createContext, withAsyncContext } from "../src/index.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const noop = () => {};

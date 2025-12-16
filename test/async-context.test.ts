@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { describe, it, expect } from "vitest";
-import { createContext, executeAsync } from "../src";
+import { createContext, executeAsync } from "../src/index.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

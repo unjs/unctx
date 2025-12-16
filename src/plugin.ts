@@ -1,5 +1,9 @@
-import { createUnplugin, type HookFilter } from "unplugin";
-import { createTransformer, type TransformerOptions } from "./transform";
+import {
+  createUnplugin,
+  type HookFilter,
+  type UnpluginInstance,
+} from "unplugin";
+import { createTransformer, type TransformerOptions } from "./transform.ts";
 
 export interface UnctxPluginOptions extends TransformerOptions {
   /** Plugin Hook Filter for the transform hook
@@ -10,8 +14,8 @@ export interface UnctxPluginOptions extends TransformerOptions {
   transformInclude?: (id: string) => boolean;
 }
 
-export const unctxPlugin = createUnplugin(
-  (options: UnctxPluginOptions = {}) => {
+export const unctxPlugin: UnpluginInstance<UnctxPluginOptions, boolean> =
+  createUnplugin((options: UnctxPluginOptions = {}) => {
     const transformer = createTransformer(options);
     return {
       name: "unctx:transform",
@@ -33,5 +37,4 @@ export const unctxPlugin = createUnplugin(
         },
       },
     };
-  },
-);
+  });

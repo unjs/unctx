@@ -1,5 +1,5 @@
 import { expect, it, describe } from "vitest";
-import { createTransformer } from "../src/transform";
+import { createTransformer } from "../src/transform.ts";
 
 describe("transforms", () => {
   const transformer = createTransformer({
