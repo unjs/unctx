@@ -18,7 +18,7 @@ export const unctxPlugin = createUnplugin(
       enforce: "post",
       transformInclude: options.transformInclude,
       transform: {
-        filter: options.transformFilter,
+        filter: options.transformFilter ?? transformer.filter,
         handler(code, id) {
           const result = transformer.transform(code);
           if (result) {
