@@ -61,7 +61,7 @@ export function createTransformer(options: TransformerOptions = {}) {
   }
 
   const filter = {
-    id: matchRE,
+    code: matchRE,
   };
 
   function transform(code: string, options_: { force?: false } = {}) {
