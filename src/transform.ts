@@ -60,6 +60,10 @@ export function createTransformer(options: TransformerOptions = {}) {
     return typeof code === "string" && matchRE.test(code);
   }
 
+  const filter = {
+    id: matchRE,
+  };
+
   function transform(code: string, options_: { force?: false } = {}) {
     if (!options_.force && !shouldTransform(code)) {
       return;
@@ -221,6 +225,7 @@ export function createTransformer(options: TransformerOptions = {}) {
 
   return {
     transform,
+    filter,
     shouldTransform,
   };
 }
