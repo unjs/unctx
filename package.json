@@ -5,42 +5,22 @@
   "repository": "unjs/unctx",
   "license": "MIT",
   "sideEffects": false,
+  "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./transform": {
-      "types": "./dist/transform.d.ts",
-      "import": "./dist/transform.mjs"
-    },
-    "./plugin": {
-      "types": "./dist/plugin.d.ts",
-      "import": "./dist/plugin.mjs"
-    }
+    ".": "./dist/index.mjs",
+    "./transform": "./dist/transform.mjs",
+    "./plugin": "./dist/plugin.mjs"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
+    "build": "obuild",
     "dev": "vitest",
     "lint": "eslint . && prettier -c src test",
     "lint:fix": "eslint --fix . && prettier -w src test",
-    "prepack": "unbuild",
-    "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "release": "pnpm build && pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit"
   },
@@ -57,10 +37,9 @@
     "changelogen": "^0.6.2",
     "eslint": "^9.39.2",
     "eslint-config-unjs": "^0.5.0",
-    "jiti": "^2.6.1",
+    "obuild": "^0.4.8",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
-    "unbuild": "^3.6.1",
     "vitest": "^4.0.16"
   },
   "packageManager": "pnpm@10.26.0"
