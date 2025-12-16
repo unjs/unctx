@@ -55,8 +55,8 @@
   "dependencies": {
     "acorn": "^8.15.0",
     "estree-walker": "^3.0.3",
-    "magic-string": "^0.30.17",
-    "unplugin": "^2.3.5"
+    "magic-string": "^0.30.21",
+    "unplugin": "^2.3.11"
   },
   "peerDependencies": {
     "oxc-parser": "^0.82.1",
@@ -64,16 +64,16 @@
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",
-    "@types/node": "^24.2.1",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@types/node": "^25.0.2",
+    "@vitest/coverage-v8": "^4.0.16",
     "changelogen": "^0.6.2",
-    "eslint": "^9.33.0",
+    "eslint": "^9.39.2",
     "eslint-config-unjs": "^0.5.0",
-    "jiti": "^2.5.1",
-    "prettier": "^3.6.2",
-    "typescript": "^5.9.2",
-    "unbuild": "^3.6.0",
-    "vitest": "^3.2.4"
+    "jiti": "^2.6.1",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "unbuild": "^3.6.1",
+    "vitest": "^4.0.16"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.26.0"
 }
