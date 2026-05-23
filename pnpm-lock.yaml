@@ -22,34 +22,34 @@ importers:
         version: 2.3.11
     devDependencies:
       '@types/estree':
-        specifier: ^1.0.8
+        specifier: 1.0.8
         version: 1.0.8
       '@types/node':
-        specifier: ^25.0.2
+        specifier: 25.0.2
         version: 25.0.2
       '@vitest/coverage-v8':
-        specifier: ^4.0.16
+        specifier: 4.0.16
         version: 4.0.16(vitest@4.0.16(@types/node@25.0.2)(jiti@2.6.1))
       changelogen:
-        specifier: ^0.6.2
+        specifier: 0.6.2
         version: 0.6.2(magicast@0.5.1)
       eslint:
-        specifier: ^9.39.2
+        specifier: 9.39.2
         version: 9.39.2(jiti@2.6.1)
       eslint-config-unjs:
-        specifier: ^0.5.0
+        specifier: 0.5.0
         version: 0.5.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       obuild:
-        specifier: ^0.4.8
+        specifier: 0.4.8
         version: 0.4.8(magicast@0.5.1)(typescript@5.9.3)
       prettier:
-        specifier: ^3.7.4
+        specifier: 3.7.4
         version: 3.7.4
       typescript:
-        specifier: ^5.9.3
+        specifier: 5.9.3
         version: 5.9.3
       vitest:
-        specifier: ^4.0.16
+        specifier: 4.0.16
         version: 4.0.16(@types/node@25.0.2)(jiti@2.6.1)
 
 packages:
