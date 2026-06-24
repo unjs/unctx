@@ -87,7 +87,7 @@ export function createTransformer(options: TransformerOptions = {}): {
     });
 
     const s = new MagicString(code);
-    const lineStarts = [1];
+    const lineStarts = [0];
     let newlineIndex = code.indexOf("\n");
     while (newlineIndex !== -1) {
       lineStarts.push(newlineIndex + 1);

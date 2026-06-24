@@ -19,6 +19,16 @@ describe("transforms", () => {
     )?.code;
   }
 
+  it("transforms code on the first line", () => {
+    expect(
+      transformer.transform(
+        "withAsyncContext(async () => { await something() })",
+      )?.code,
+    ).toMatchInlineSnapshot(
+      `"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore()); },1)"`,
+    );
+  });
+
   it("transforms", () => {
     expect(
       transform(`
