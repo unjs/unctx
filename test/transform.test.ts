@@ -1,6 +1,6 @@
 import { expect, it, describe } from "vitest";
-import { createTransformer as acornTransformer } from "../src/transform/acorn";
-import { createTransformer as oxcTransformer } from "../src/transform/oxc";
+import { createTransformer as acornTransformer } from "../src/transform/acorn.ts";
+import { createTransformer as oxcTransformer } from "../src/transform/oxc.ts";
 
 const transformers = [
   { name: "acorn", create: acornTransformer },
@@ -26,6 +26,12 @@ describe("transforms", () => {
             .join("\n"),
         )?.code;
       }
+
+      it("throws on invalid syntax", () => {
+        expect(() =>
+          transformer.transform("withAsyncContext(async () => {"),
+        ).toThrow();
+      });
 
       it("transforms", () => {
         expect(

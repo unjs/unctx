@@ -9,38 +9,39 @@ import type {
   Position,
 } from "estree";
 import {
+  createTransformerFilter,
+  type Transformer,
   type TransformerOptions,
   defaultTransformerOptions,
   kInjected,
 } from "./_shared.js";
 
+export type { TransformerOptions } from "./_shared.ts";
+
 type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
 };
 
-export function createTransformer(options: TransformerOptions = {}) {
+export function createTransformer(
+  options: TransformerOptions = {},
+): Transformer {
   options = {
     ...defaultTransformerOptions(),
     ...options,
   };
 
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
+  const filter = createTransformerFilter(options);
+  const matchRE = filter.code;
 
-  const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
-      "|",
-    )})\\(`,
-  );
-
-  function shouldTransform(code: string) {
+  function shouldTransform(code: string): boolean {
     return typeof code === "string" && matchRE.test(code);
   }
 
-  const filter = {
-    code: matchRE,
-  };
-
-  function transform(code: string, options_: { force?: false } = {}) {
+  function transform(
+    code: string,
+    options_: { force?: false } = {},
+  ): { code: string; magicString: MagicString } | undefined {
     if (!options_.force && !shouldTransform(code)) {
       return;
     }

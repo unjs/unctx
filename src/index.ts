@@ -163,11 +163,18 @@ export const defaultNamespace: ContextNamespace =
   (_globalThis as any)[globalKey] ||
   ((_globalThis as any)[globalKey] = createNamespace());
 
-export const getContext = <T>(key: string, opts: ContextOptions = {}) =>
+export const getContext: <T>(
+  key: string,
+  opts?: ContextOptions,
+) => UseContext<T> = <T>(key: string, opts: ContextOptions = {}) =>
   defaultNamespace.get<T>(key, opts);
 
-export const useContext = <T>(key: string, opts: ContextOptions = {}) =>
-  getContext<T>(key, opts).use;
+export const useContext: <T>(key: string, opts?: ContextOptions) => () => T = <
+  T,
+>(
+  key: string,
+  opts: ContextOptions = {},
+) => getContext<T>(key, opts).use;
 
 const asyncHandlersKey = "__unctx_async_handlers__";
 const asyncHandlers: Set<OnAsyncLeave> =

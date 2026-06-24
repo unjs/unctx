@@ -1,5 +1,12 @@
-import { createUnplugin, type HookFilter } from "unplugin";
-import { type TransformerOptions } from "./transform/_shared.js";
+import {
+  createUnplugin,
+  type HookFilter,
+  type UnpluginInstance,
+} from "unplugin";
+import {
+  createTransformerFilter,
+  type TransformerOptions,
+} from "./transform/_shared.ts";
 
 export interface UnctxPluginOptions extends TransformerOptions {
   /** The parser to use.
@@ -14,32 +21,22 @@ export interface UnctxPluginOptions extends TransformerOptions {
   transformInclude?: (id: string) => boolean;
 }
 
-let transformer:
-  | ReturnType<typeof import("./transform/acorn.js").createTransformer>
-  | ReturnType<typeof import("./transform/oxc.js").createTransformer>
-  | undefined;
-async function loadCreateTransformerFn(options: UnctxPluginOptions) {
-  if (transformer) {
-    return;
-  }
-  const { createTransformer } =
-    !options.parser || options.parser === "acorn"
-      ? await import("./transform/acorn")
-      : await import("./transform/oxc");
-  transformer = createTransformer(options);
-}
+export const unctxPlugin: UnpluginInstance<UnctxPluginOptions, false> =
+  createUnplugin((options: UnctxPluginOptions = {}) => {
+    const transformer = (
+      options.parser === "oxc"
+        ? import("./transform/oxc.ts")
+        : import("./transform/acorn.ts")
+    ).then(({ createTransformer }) => createTransformer(options));
 
-export const unctxPlugin = createUnplugin(
-  (options: UnctxPluginOptions = {}) => {
     return {
       name: "unctx:transform",
       enforce: "post",
       transformInclude: options.transformInclude,
       transform: {
-        filter: options.transformFilter,
+        filter: options.transformFilter ?? createTransformerFilter(options),
         async handler(code, id) {
-          await loadCreateTransformerFn(options);
-          const result = transformer!.transform(code);
+          const result = (await transformer).transform(code);
           if (result) {
             return {
               code: result.code,
@@ -52,5 +49,4 @@ export const unctxPlugin = createUnplugin(
         },
       },
     };
-  },
-);
+  });

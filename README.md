@@ -136,6 +136,17 @@ unctxPlugin.vite();
 unctxPlugin.webpack();
 ```
 
+Acorn is used by default. To use the experimental Oxc transform, install the
+optional parser dependencies and select it in the plugin options:
+
+```sh
+pnpm add oxc-parser oxc-walker
+```
+
+```js
+unctxPlugin.vite({ parser: "oxc" });
+```
+
 Use `ctx.callAsync` instead of `ctx.call`:
 
 ```js

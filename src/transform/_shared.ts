@@ -1,3 +1,5 @@
+import type MagicString from "magic-string";
+
 export interface TransformerOptions {
   /**
    * The function names to be transformed.
@@ -24,14 +26,38 @@ export interface TransformerOptions {
 
 export const kInjected = "__unctx_injected__";
 
-export type MaybeHandledNode = Node & {
-  [kInjected]?: boolean;
-};
+export interface Transformer {
+  transform: (
+    code: string,
+    options?: { force?: false },
+  ) => { code: string; magicString: MagicString } | undefined;
+  filter: {
+    code: RegExp;
+  };
+  shouldTransform: (code: string) => boolean;
+}
 
-export const defaultTransformerOptions = () =>
-  ({
+export function defaultTransformerOptions(): TransformerOptions {
+  return {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
     helperName: "executeAsync",
     objectDefinitions: {},
-  }) satisfies TransformerOptions;
+  };
+}
+
+export function createTransformerFilter(options: TransformerOptions): {
+  code: RegExp;
+} {
+  const {
+    asyncFunctions = defaultTransformerOptions().asyncFunctions,
+    objectDefinitions = defaultTransformerOptions().objectDefinitions,
+  } = options;
+  return {
+    code: new RegExp(
+      `\\b(${[...asyncFunctions!, ...Object.keys(objectDefinitions!)].join(
+        "|",
+      )})\\(`,
+    ),
+  };
+}

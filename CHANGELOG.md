@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v2.5.0
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.4.1...v2.5.0)
+
+### 🚀 Enhancements
+
+- **plugin:** Support `transformFilter` option ([#112](https://github.com/unjs/unctx/pull/112))
+
+### 🔥 Performance
+
+- **plugin:** Transform hook filter ([#122](https://github.com/unjs/unctx/pull/122))
+
+### 🏡 Chore
+
+- Update deps ([b33c9cf](https://github.com/unjs/unctx/commit/b33c9cf))
+- Update deps ([e6a945e](https://github.com/unjs/unctx/commit/e6a945e))
+
+### ❤️ Contributors
+
+- Daniel Roe ([@danielroe](https://github.com/danielroe))
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Alexander Lichter ([@TheAlexLichter](https://github.com/TheAlexLichter))
+
 ## v2.4.1
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.4.0...v2.4.1)

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createContext, createNamespace } from "../src";
+import { createContext, createNamespace } from "../src/index.ts";
 
 describe("createContext", () => {
   it("call and use", () => {

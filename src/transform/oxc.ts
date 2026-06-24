@@ -11,46 +11,56 @@ import type {
   AwaitExpression,
 } from "oxc-parser";
 import {
+  createTransformerFilter,
   defaultTransformerOptions,
   kInjected,
+  type Transformer,
   type TransformerOptions,
-} from "./_shared";
+} from "./_shared.ts";
+
+export type { TransformerOptions } from "./_shared.ts";
 
 type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
 };
 
-export function createTransformer(options: TransformerOptions = {}) {
+export function createTransformer(
+  options: TransformerOptions = {},
+): Transformer {
   options = {
     ...defaultTransformerOptions(),
     ...options,
   };
 
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
+  const filter = createTransformerFilter(options);
+  const matchRE = filter.code;
 
-  const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
-      "|",
-    )})\\(`,
-  );
-
-  function shouldTransform(code: string) {
+  function shouldTransform(code: string): boolean {
     return typeof code === "string" && matchRE.test(code);
   }
 
-  function transform(code: string, options_: { force?: false } = {}) {
+  function transform(
+    code: string,
+    options_: { force?: false } = {},
+  ): { code: string; magicString: MagicString } | undefined {
     if (!options_.force && !shouldTransform(code)) {
       return;
     }
-    const ast = parseSync("", code, {
+    const parsed = parseSync("", code, {
       sourceType: "module",
     });
+    if (parsed.errors.length > 0) {
+      throw new SyntaxError(
+        parsed.errors.map((error) => error.message).join("\n"),
+      );
+    }
 
     const s = new MagicString(code);
 
     let detected = false;
 
-    walk(ast.program, {
+    walk(parsed.program, {
       enter(node: Node) {
         if (node.type === "CallExpression") {
           const functionName = _getFunctionName(node.callee);
@@ -58,7 +68,7 @@ export function createTransformer(options: TransformerOptions = {}) {
             transformFunctionArguments(node);
             if (functionName !== "callAsync") {
               const lastArgument = node.arguments[node.arguments.length - 1];
-              if (lastArgument && lastArgument.end) {
+              if (lastArgument) {
                 s.appendRight(lastArgument.end, ",1");
               }
             }
@@ -151,7 +161,7 @@ export function createTransformer(options: TransformerOptions = {}) {
         },
       });
 
-      if (injectVariable && body.start) {
+      if (injectVariable) {
         s.appendLeft(body.start + 1, "let __temp, __restore;");
       }
     }
@@ -167,10 +177,6 @@ export function createTransformer(options: TransformerOptions = {}) {
       parent: Node | undefined | null,
     ) {
       const isStatement = parent?.type === "ExpressionStatement";
-
-      if (!node.start || !node.argument.start) {
-        return;
-      }
 
       s.remove(node.start, node.argument.start);
       s.remove(node.end, node.argument.end);
@@ -191,8 +197,9 @@ export function createTransformer(options: TransformerOptions = {}) {
   }
 
   return {
-    transform,
-    shouldTransform,
+    transform: transform,
+    filter: filter,
+    shouldTransform: shouldTransform,
   };
 }
 

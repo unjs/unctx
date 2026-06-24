@@ -1,54 +1,28 @@
 {
   "name": "unctx",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "description": "Composition-api in Vanilla js",
   "repository": "unjs/unctx",
   "license": "MIT",
   "sideEffects": false,
+  "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./transform": {
-      "types": "./dist/transform/index.d.ts",
-      "import": "./dist/transform/index.mjs"
-    },
-    "./transform/acorn": {
-      "types": "./dist/transform/acorn.d.ts",
-      "import": "./dist/transform/acorn.mjs"
-    },
-    "./transform/oxc": {
-      "types": "./dist/transform/oxc.d.ts",
-      "import": "./dist/transform/oxc.mjs"
-    },
-    "./plugin": {
-      "types": "./dist/plugin.d.ts",
-      "import": "./dist/plugin.mjs"
-    }
+    ".": "./dist/index.mjs",
+    "./transform": "./dist/transform.mjs",
+    "./transform/acorn": "./dist/transform/acorn.mjs",
+    "./transform/oxc": "./dist/transform/oxc.mjs",
+    "./plugin": "./dist/plugin.mjs"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
+    "build": "obuild",
     "dev": "vitest",
     "lint": "eslint . && prettier -c src test",
     "lint:fix": "eslint --fix . && prettier -w src test",
-    "prepack": "unbuild",
-    "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "release": "pnpm build && pnpm test && changelogen --release && npm publish && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit"
   },
@@ -59,8 +33,16 @@
     "unplugin": "^2.3.11"
   },
   "peerDependencies": {
-    "oxc-parser": "^0.82.1",
-    "oxc-walker": "^0.4.0"
+    "oxc-parser": "^0.137.0",
+    "oxc-walker": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "oxc-parser": {
+      "optional": true
+    },
+    "oxc-walker": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",
@@ -70,9 +52,11 @@
     "eslint": "^9.39.2",
     "eslint-config-unjs": "^0.5.0",
     "jiti": "^2.6.1",
+    "obuild": "^0.4.8",
+    "oxc-parser": "^0.137.0",
+    "oxc-walker": "^1.0.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",
-    "unbuild": "^3.6.1",
     "vitest": "^4.0.16"
   },
   "packageManager": "pnpm@10.26.0"
