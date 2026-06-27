@@ -317,4 +317,33 @@ describe("transforms", () => {
       "
     `);
   });
+
+  describe("shouldTransform", () => {
+    it("requires both a matched function and an await", () => {
+      // matched function + await -> candidate for transform
+      expect(
+        transformer.shouldTransform(
+          "withAsyncContext(async () => { await x() })",
+        ),
+      ).toBe(true);
+      // matched function but no await -> nothing to rewrite, skip the parse
+      expect(
+        transformer.shouldTransform("withAsyncContext(async () => { x() })"),
+      ).toBe(false);
+      // await but no matched function
+      expect(transformer.shouldTransform("async () => { await x() }")).toBe(
+        false,
+      );
+      // `await` must be the keyword, not part of an identifier
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => awaitable())"),
+      ).toBe(false);
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => obj.await())"),
+      ).toBe(false);
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => $await())"),
+      ).toBe(false);
+    });
+  });
 });
