@@ -39,7 +39,7 @@
     "eslint-config-unjs": "^0.5.0",
     "obuild": "^0.4.8",
     "prettier": "^3.7.4",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.0.16"
   },
   "packageManager": "pnpm@10.26.0"
