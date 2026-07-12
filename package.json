@@ -1,6 +1,6 @@
 {
   "name": "unctx",
-  "version": "2.5.0",
+  "version": "3.0.0-beta.0",
   "description": "Composition-api in Vanilla js",
   "repository": "unjs/unctx",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "dev": "vitest",
     "lint": "eslint . && prettier -c src test",
     "lint:fix": "eslint --fix . && prettier -w src test",
-    "release": "pnpm build && pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "release": "pnpm test && pnpm build && changelogen --release --prerelease && npm publish --tag beta && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit"
   },
