@@ -33,7 +33,7 @@ export interface TransformerOptions {
 export interface Transformer {
   transform: (
     code: string,
-    options?: { force?: false },
+    options?: { force?: boolean },
   ) => { code: string; magicString: MagicString } | undefined;
   filter: {
     code: RegExp;
@@ -128,7 +128,7 @@ export async function createTransformer(
 
   function transform(
     code: string,
-    options_: { force?: false } = {},
+    options_: { force?: boolean } = {},
   ): { code: string; magicString: MagicString } | undefined {
     if (!options_.force && !shouldTransform(code)) {
       return;
