@@ -1,17 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { unctxPlugin } from "../src/plugin.ts";
 
-function createTransformHandler(
-  parser: "acorn" | "oxc",
-  asyncFunction: string,
-) {
-  const plugin = unctxPlugin.raw(
+function createTransformHandler(asyncFunction: string) {
+  const raw = unctxPlugin.raw(
     {
-      parser,
       asyncFunctions: [asyncFunction],
     },
     { framework: "vite" },
   );
+  const plugin = Array.isArray(raw) ? raw[0]! : raw;
   if (!plugin.transform || typeof plugin.transform === "function") {
     throw new TypeError("Expected an object transform hook");
   }
@@ -20,27 +17,27 @@ function createTransformHandler(
 
 describe("plugin", () => {
   it("isolates transformer options between instances", async () => {
-    const acornTransform = createTransformHandler("acorn", "acornAsync");
-    const oxcTransform = createTransformHandler("oxc", "oxcAsync");
+    const fooTransform = createTransformHandler("fooAsync");
+    const barTransform = createTransformHandler("barAsync");
 
-    const acornResult = await acornTransform.call(
+    const fooResult = await fooTransform.call(
       undefined as never,
-      "acornAsync(async () => { await task() })",
-      "acorn.js",
+      "fooAsync(async () => { await task() })",
+      "foo.js",
     );
-    const oxcResult = await oxcTransform.call(
+    const barResult = await barTransform.call(
       undefined as never,
-      "oxcAsync(async () => { await task() })",
-      "oxc.js",
+      "barAsync(async () => { await task() })",
+      "bar.js",
     );
 
-    expect(acornResult).toBeTruthy();
-    expect(oxcResult).toBeTruthy();
+    expect(fooResult).toBeTruthy();
+    expect(barResult).toBeTruthy();
     expect(
-      await acornTransform.call(
+      await fooTransform.call(
         undefined as never,
-        "oxcAsync(async () => { await task() })",
-        "acorn.js",
+        "barAsync(async () => { await task() })",
+        "foo.js",
       ),
     ).toBeUndefined();
   });

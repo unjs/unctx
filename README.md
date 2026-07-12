@@ -17,9 +17,7 @@
 In your **awesome** library:
 
 ```bash
-yarn add unctx
-# or
-npm install unctx
+npx nypm i unctx
 ```
 
 ```js
@@ -118,6 +116,12 @@ ctx.call("123", () => {
 
 Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each async/await statement. This requires using a bundler such as Rollup, Vite, or Webpack.
 
+First, install the `unplugin`, `oxc-parser` and `oxc-walker` peer dependencies:
+
+```sh
+npx nypm i -D unplugin oxc-parser oxc-walker
+```
+
 Import and register transform plugin:
 
 ```js
@@ -134,17 +138,6 @@ unctxPlugin.vite();
 // Webpack
 // TODO: Add to webpack configuration
 unctxPlugin.webpack();
-```
-
-Acorn is used by default. To use the experimental Oxc transform, install the
-optional parser dependencies and select it in the plugin options:
-
-```sh
-pnpm add oxc-parser oxc-walker
-```
-
-```js
-unctxPlugin.vite({ parser: "oxc" });
 ```
 
 Use `ctx.callAsync` instead of `ctx.call`:
