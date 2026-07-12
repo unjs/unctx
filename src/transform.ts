@@ -91,7 +91,12 @@ export function createTransformer(options: TransformerOptions = {}): {
     });
 
     const s = new MagicString(code);
-    const lines = code.split("\n");
+    const lineStarts = [0];
+    let newlineIndex = code.indexOf("\n");
+    while (newlineIndex !== -1) {
+      lineStarts.push(newlineIndex + 1);
+      newlineIndex = code.indexOf("\n", newlineIndex + 1);
+    }
 
     let detected = false;
 
@@ -151,7 +156,7 @@ export function createTransformer(options: TransformerOptions = {}): {
     };
 
     function toIndex(pos: Position) {
-      return lines.slice(0, pos.line - 1).join("\n").length + pos.column + 1;
+      return lineStarts[pos.line - 1] + pos.column;
     }
 
     function transformFunctionBody(function_: Node) {
