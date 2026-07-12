@@ -60,13 +60,26 @@ export function createContext<T = any>(
     }
   }
 
+  // Wrap object instances in a WeakRef before storing them in AsyncLocalStorage.
+  // A long-lived async resource (e.g. a timer) created inside `als.run()` pins the
+  // ALS store for its whole lifetime; storing the instance directly would keep the
+  // entire instance alive and leak memory. A WeakRef lets the instance be GC'd while
+  // the (tiny) wrapper is retained. Primitives can't be WeakRef targets, so they are
+  // stored as-is. https://github.com/unjs/unctx/issues/100
+  const _wrapInstance = (instance: T) =>
+    als && instance !== null && typeof instance === "object"
+      ? { __unctx_weak: new WeakRef(instance as object) }
+      : instance;
+  const _unwrapInstance = (store: any) =>
+    store && store.__unctx_weak ? store.__unctx_weak.deref() : store;
+
   const _getCurrentInstance = () => {
     // TODO: Investigate better solution to make sure currentInstance is in sync with AsyncLocalStorage
     // https://github.com/unjs/unctx/issues/100
     if (als /* && currentInstance === undefined */) {
-      const instance = als.getStore();
-      if (instance !== undefined) {
-        return instance;
+      const store = als.getStore();
+      if (store !== undefined) {
+        return _unwrapInstance(store);
       }
     }
     return currentInstance;
@@ -98,7 +111,7 @@ export function createContext<T = any>(
       checkConflict(instance);
       currentInstance = instance;
       try {
-        return als ? als.run(instance, callback) : callback();
+        return als ? als.run(_wrapInstance(instance), callback) : callback();
       } finally {
         if (!isSingleton) {
           currentInstance = undefined;
@@ -114,7 +127,7 @@ export function createContext<T = any>(
         currentInstance === instance ? onRestore : undefined;
       asyncHandlers.add(onLeave);
       try {
-        const r = als ? als.run(instance, callback) : callback();
+        const r = als ? als.run(_wrapInstance(instance), callback) : callback();
         if (!isSingleton) {
           currentInstance = undefined;
         }
