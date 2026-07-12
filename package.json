@@ -25,22 +25,22 @@
     "test:types": "tsc --noEmit"
   },
   "dependencies": {
-    "acorn": "^8.15.0",
+    "acorn": "^8.17.0",
     "estree-walker": "^3.0.3",
     "magic-string": "^0.30.21",
     "unplugin": "^2.3.11"
   },
   "devDependencies": {
-    "@types/estree": "^1.0.8",
-    "@types/node": "^25.0.2",
-    "@vitest/coverage-v8": "^4.0.16",
+    "@types/estree": "^1.0.9",
+    "@types/node": "^25.9.5",
+    "@vitest/coverage-v8": "^4.1.10",
     "changelogen": "^0.6.2",
-    "eslint": "^9.39.2",
-    "eslint-config-unjs": "^0.5.0",
-    "obuild": "^0.4.8",
-    "prettier": "^3.7.4",
+    "eslint": "^9.39.4",
+    "eslint-config-unjs": "^0.6.2",
+    "obuild": "^0.4.37",
+    "prettier": "^3.9.5",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.10"
   },
-  "packageManager": "pnpm@10.26.0"
+  "packageManager": "pnpm@10.34.4"
 }
