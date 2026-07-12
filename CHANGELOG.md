@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v3.0.0-beta.2
+
+[compare changes](https://github.com/unjs/unctx/compare/v3.0.0-beta.1...v3.0.0-beta.2)
+
+### 💅 Refactors
+
+- ⚠️  Use oxc as transformer ([#113](https://github.com/unjs/unctx/pull/113))
+
+### 📖 Documentation
+
+- Add transform api ([f0aee98](https://github.com/unjs/unctx/commit/f0aee98))
+
+### 🌊 Types
+
+- **transform:** Allow `force` to be a boolean ([2a34795](https://github.com/unjs/unctx/commit/2a34795))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Use oxc as transformer ([#113](https://github.com/unjs/unctx/pull/113))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Alexander Lichter ([@TheAlexLichter](https://github.com/TheAlexLichter))
+
 ## v3.0.0-beta.1
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.5.0...v3.0.0-beta.1)
