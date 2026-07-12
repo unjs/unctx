@@ -168,6 +168,51 @@ const setup = withAsyncContext(async () => {
 });
 ```
 
+### Transform API
+
+If you are not using a bundler (or are building your own integration), the transform used by the plugin is also available standalone from `unctx/transform`. It only needs `magic-string` and an oxc parser (`oxc-parser` or `rolldown`) — `unplugin` is not required.
+
+```js
+import { createTransformer } from "unctx/transform";
+
+const transformer = await createTransformer({
+  // asyncFunctions: ["withAsyncContext"],
+  // helperModule: "unctx",
+  // helperName: "executeAsync",
+  // objectDefinitions: {},
+});
+
+const result = transformer.transform(code);
+
+if (result) {
+  console.log(result.code); // Transformed code
+  console.log(result.magicString.generateMap()); // Source map
+}
+```
+
+`createTransformer` is async because the parser is imported lazily. It resolves to an object with:
+
+- `transform(code, { force? })`: Returns `{ code, magicString }`, or `undefined` when nothing was transformed. Pass `{ force: true }` to skip the `shouldTransform` pre-check and always parse.
+- `shouldTransform(code)`: Cheap check whether `code` contains a transformable call and an `await`.
+- `filter`: `{ code: RegExp }` used to skip files that cannot contain a transformable call.
+
+The same regexp can be computed without loading the parser via `getTransformFilter(options)`, which is useful for pre-filtering files:
+
+```js
+import { getTransformFilter } from "unctx/transform";
+
+const { code: codeFilter } = getTransformFilter();
+```
+
+Options are shared with `unctxPlugin`:
+
+| Option              | Default                | Description                                                                                                                                                          |
+| ------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `asyncFunctions`    | `["withAsyncContext"]` | Function names whose function arguments should be transformed. Add `"callAsync"` to transform `ctx.callAsync` usages.                                                |
+| `helperModule`      | `"unctx"`              | Module the async helper is imported from.                                                                                                                            |
+| `helperName`        | `"executeAsync"`       | Name of the async helper exported by `helperModule`.                                                                                                                 |
+| `objectDefinitions` | `{}`                   | Object properties to transform, keyed by the defining function. For example `{ defineMeta: ["middleware"] }` transforms the `middleware` key passed to `defineMeta`. |
+
 ## Singleton Pattern
 
 If you are sure it is safe to use a shared instance (not depending to request), you can also use `ctx.set` and `ctx.unset` for a [singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
