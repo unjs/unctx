@@ -1,4 +1,4 @@
-import MagicString from "magic-string";
+import type MagicString from "magic-string";
 import type {
   Node,
   CallExpression,
@@ -93,7 +93,10 @@ export async function createTransformer(
     ...options,
   };
 
-  const parseSync = await loadParseSync();
+  const [parseSync, MagicString] = await Promise.all([
+    loadParseSync(),
+    import("magic-string").then((r) => r.default),
+  ]);
 
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 

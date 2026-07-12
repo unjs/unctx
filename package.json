@@ -24,15 +24,16 @@
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit"
   },
-  "dependencies": {
-    "magic-string": "^0.30.21"
-  },
   "peerDependencies": {
+    "magic-string": "^0.30.21",
     "oxc-parser": "^0.137.0",
     "rolldown": "^1.0.0",
     "unplugin": "^3.3.0"
   },
   "peerDependenciesMeta": {
+    "magic-string": {
+      "optional": true
+    },
     "oxc-parser": {
       "optional": true
     },
@@ -50,6 +51,7 @@
     "eslint": "^10.7.0",
     "eslint-config-unjs": "^0.6.2",
     "jiti": "^2.7.0",
+    "magic-string": "^0.30.21",
     "obuild": "^0.4.38",
     "oxc-parser": "^0.137.0",
     "prettier": "^3.9.5",

@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      magic-string:
-        specifier: ^0.30.21
-        version: 0.30.21
     devDependencies:
       '@types/node':
         specifier: ^26.1.1
@@ -30,6 +26,9 @@ importers:
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
       obuild:
         specifier: ^0.4.38
         version: 0.4.38(chokidar@5.0.0)(dotenv@17.4.2)(giget@3.3.0)(jiti@2.7.0)(magicast@0.5.3)(typescript@6.0.3)
