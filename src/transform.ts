@@ -35,6 +35,8 @@ export interface TransformerOptions {
 
 const kInjected = "__unctx_injected__";
 
+const AWAIT_RE = /(?<![\w$.])await(?![\w$])/;
+
 type MaybeHandledNode = Node & {
   [kInjected]?: boolean;
 };
@@ -66,7 +68,9 @@ export function createTransformer(options: TransformerOptions = {}): {
   );
 
   function shouldTransform(code: string): boolean {
-    return typeof code === "string" && matchRE.test(code);
+    return (
+      typeof code === "string" && matchRE.test(code) && AWAIT_RE.test(code)
+    );
   }
 
   const filter = {
