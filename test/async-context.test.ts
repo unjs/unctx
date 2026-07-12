@@ -1,8 +1,22 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import v8 from "node:v8";
+import vm from "node:vm";
 import { describe, it, expect } from "vitest";
 import { createContext, executeAsync } from "../src/index.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Obtain a `gc()` function without requiring the `--expose-gc` node flag so the
+// memory-leak regression test runs in any environment (including CI).
+const gc: () => void = (() => {
+  if (typeof globalThis.gc === "function") return globalThis.gc;
+  try {
+    v8.setFlagsFromString("--expose-gc");
+    return vm.runInNewContext("gc");
+  } catch {
+    return undefined as unknown as () => void;
+  }
+})();
 
 describe("Async context", () => {
   it("AsyncLocalStorage works", async () => {
@@ -54,6 +68,53 @@ describe("Async context", () => {
 
     expect(result).toEqual(["A", "B", "C"]);
   });
+
+  it.runIf(typeof gc === "function")(
+    "does not leak instances pinned by long-lived async resources",
+    async () => {
+      const context = createContext<{ id: number; payload: Uint8Array }>({
+        asyncContext: true,
+        AsyncLocalStorage,
+      });
+
+      // A long-lived timer created *inside* the call pins the ALS store for its
+      // whole lifetime. Without a WeakRef wrapper this keeps the whole instance
+      // alive. The timer callback intentionally does not reference the instance.
+      const liveTimers: NodeJS.Timeout[] = [];
+
+      let collected = 0;
+      const total = 20;
+      const registry = new FinalizationRegistry(() => collected++);
+
+      for (let i = 0; i < total; i++) {
+        let instance: { id: number; payload: Uint8Array } | undefined = {
+          id: i,
+          payload: new Uint8Array(1024 * 1024),
+        };
+        registry.register(instance, i);
+
+        context.call(instance, () => {
+          // context is still readable inside the call
+          expect(context.use().id).toBe(i);
+          liveTimers.push(setInterval(() => {}, 1_000_000));
+        });
+
+        instance = undefined; // drop the only strong reference
+      }
+
+      for (let i = 0; i < 12; i++) {
+        gc();
+        await sleep(5);
+      }
+
+      for (const timer of liveTimers) {
+        clearInterval(timer);
+      }
+
+      // All instances must be collectable even though their timers are alive.
+      expect(collected).toBe(total);
+    },
+  );
 
   it("Context from use match correct context", async () => {
     const context = createContext({
