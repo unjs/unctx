@@ -1,14 +1,14 @@
 import { expect, it, describe } from "vitest";
 import { createTransformer } from "../src/transform.ts";
 
-describe("transforms", () => {
-  const transformer = createTransformer({
-    asyncFunctions: ["withAsyncContext", "callAsync"],
-    objectDefinitions: {
-      defineSomething: ["someKey"],
-    },
-  });
+const transformer = await createTransformer({
+  asyncFunctions: ["withAsyncContext", "callAsync"],
+  objectDefinitions: {
+    defineSomething: ["someKey"],
+  },
+});
 
+describe("transforms", () => {
   function transform(input: string) {
     return transformer.transform(
       // Slice 6 spaces indention for snapshot alignment

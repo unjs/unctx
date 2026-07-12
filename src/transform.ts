@@ -1,6 +1,4 @@
-import { parseSync } from "oxc-parser";
 import MagicString from "magic-string";
-import { walk } from "oxc-walker";
 import type {
   Node,
   CallExpression,
@@ -32,15 +30,7 @@ export interface TransformerOptions {
   objectDefinitions?: Record<string, string[]>;
 }
 
-const kInjected = "__unctx_injected__";
-
-const AWAIT_RE = /(?<![\w$.])await(?![\w$])/;
-
-type MaybeHandledNode = Node & {
-  [kInjected]?: boolean;
-};
-
-export function createTransformer(options: TransformerOptions = {}): {
+export interface Transformer {
   transform: (
     code: string,
     options?: { force?: false },
@@ -49,7 +39,52 @@ export function createTransformer(options: TransformerOptions = {}): {
     code: RegExp;
   };
   shouldTransform: (code: string) => boolean;
+}
+
+const kInjected = "__unctx_injected__";
+
+const AWAIT_RE = /(?<![\w$.])await(?![\w$])/;
+
+type MaybeHandledNode = Node & {
+  [kInjected]?: boolean;
+};
+
+/**
+ * Compute the (synchronous) code filter used to cheaply skip files that cannot
+ * contain a transformable call. This is exposed separately so the plugin can
+ * provide a filter without awaiting the (lazily loaded) transformer.
+ */
+export function getTransformFilter(options: TransformerOptions = {}): {
+  code: RegExp;
 } {
+  const asyncFunctions = options.asyncFunctions ?? ["withAsyncContext"];
+  const objectDefinitionFunctions = Object.keys(
+    options.objectDefinitions ?? {},
+  );
+  return {
+    code: new RegExp(
+      `\\b(${[...asyncFunctions, ...objectDefinitionFunctions].join("|")})\\(`,
+    ),
+  };
+}
+
+/**
+ * Load oxc's `parseSync`, dynamically importing `oxc-parser` and falling back
+ * to `rolldown/utils` (which re-exports the oxc utilities) so that consumers
+ * already depending on rolldown don't need `oxc-parser` installed separately.
+ */
+async function loadParseSync(): Promise<typeof import("oxc-parser").parseSync> {
+  try {
+    return (await import("oxc-parser")).parseSync;
+  } catch {
+    return (await import("rolldown/utils"))
+      .parseSync as typeof import("oxc-parser").parseSync;
+  }
+}
+
+export async function createTransformer(
+  options: TransformerOptions = {},
+): Promise<Transformer> {
   options = {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
@@ -58,23 +93,21 @@ export function createTransformer(options: TransformerOptions = {}): {
     ...options,
   };
 
+  const [parseSync, { walk }] = await Promise.all([
+    loadParseSync(),
+    import("oxc-walker"),
+  ]);
+
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 
-  const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
-      "|",
-    )})\\(`,
-  );
+  const filter = getTransformFilter(options);
+  const matchRE = filter.code;
 
   function shouldTransform(code: string): boolean {
     return (
       typeof code === "string" && matchRE.test(code) && AWAIT_RE.test(code)
     );
   }
-
-  const filter = {
-    code: matchRE,
-  };
 
   function transform(
     code: string,

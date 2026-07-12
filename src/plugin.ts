@@ -3,7 +3,11 @@ import {
   type HookFilter,
   type UnpluginInstance,
 } from "unplugin";
-import { createTransformer, type TransformerOptions } from "./transform.ts";
+import {
+  createTransformer,
+  getTransformFilter,
+  type TransformerOptions,
+} from "./transform.ts";
 
 export interface UnctxPluginOptions extends TransformerOptions {
   /** Plugin Hook Filter for the transform hook
@@ -22,9 +26,9 @@ export const unctxPlugin: UnpluginInstance<UnctxPluginOptions, boolean> =
       enforce: "post",
       transformInclude: options.transformInclude,
       transform: {
-        filter: options.transformFilter ?? transformer.filter,
-        handler(code, id) {
-          const result = transformer.transform(code);
+        filter: options.transformFilter ?? getTransformFilter(options),
+        async handler(code, id) {
+          const result = (await transformer).transform(code);
           if (result) {
             return {
               code: result.code,

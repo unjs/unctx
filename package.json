@@ -30,6 +30,7 @@
   "peerDependencies": {
     "oxc-parser": "^0.137.0",
     "oxc-walker": "^1.0.0",
+    "rolldown": "^1.0.0",
     "unplugin": "^3.3.0"
   },
   "peerDependenciesMeta": {
@@ -37,6 +38,9 @@
       "optional": true
     },
     "oxc-walker": {
+      "optional": true
+    },
+    "rolldown": {
       "optional": true
     },
     "unplugin": {
@@ -54,6 +58,7 @@
     "oxc-parser": "^0.137.0",
     "oxc-walker": "^1.0.0",
     "prettier": "^3.9.5",
+    "rolldown": "^1.1.5",
     "typescript": "^6",
     "unplugin": "^3.3.0",
     "vitest": "^4.1.10"

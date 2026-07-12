@@ -116,10 +116,15 @@ ctx.call("123", () => {
 
 Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each async/await statement. This requires using a bundler such as Rollup, Vite, or Webpack.
 
-First, install the `unplugin`, `oxc-parser` and `oxc-walker` peer dependencies:
+First, install the plugin peer dependencies. You always need `unplugin` and
+`oxc-walker`, plus an oxc parser — either `oxc-parser` directly, or `rolldown`
+(which re-exports the oxc utilities), which is convenient if you already depend
+on it:
 
 ```sh
-npx nypm i -D unplugin oxc-parser oxc-walker
+npx nypm i -D unplugin oxc-walker oxc-parser
+# or, if you already use rolldown:
+npx nypm i -D unplugin oxc-walker rolldown
 ```
 
 Import and register transform plugin:
