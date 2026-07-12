@@ -1,14 +1,14 @@
 import { expect, it, describe } from "vitest";
 import { createTransformer } from "../src/transform.ts";
 
-describe("transforms", () => {
-  const transformer = createTransformer({
-    asyncFunctions: ["withAsyncContext", "callAsync"],
-    objectDefinitions: {
-      defineSomething: ["someKey"],
-    },
-  });
+const transformer = await createTransformer({
+  asyncFunctions: ["withAsyncContext", "callAsync"],
+  objectDefinitions: {
+    defineSomething: ["someKey"],
+  },
+});
 
+describe("transforms", () => {
   function transform(input: string) {
     return transformer.transform(
       // Slice 6 spaces indention for snapshot alignment
@@ -27,6 +27,12 @@ describe("transforms", () => {
     ).toMatchInlineSnapshot(
       `"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore()); },1)"`,
     );
+  });
+
+  it("throws on invalid syntax", () => {
+    expect(() =>
+      transformer.transform("withAsyncContext(async () => { await task()"),
+    ).toThrow();
   });
 
   it("transforms", () => {
@@ -312,6 +318,7 @@ describe("transforms", () => {
     `),
     ).toBeUndefined();
   });
+
   it("Should not add a statement terminator if expression comes after if statement", () => {
     expect(
       transform(`

@@ -1,13 +1,10 @@
-import * as acorn from "acorn";
-import MagicString from "magic-string";
-import { walk } from "estree-walker";
+import type MagicString from "magic-string";
 import type {
   Node,
   CallExpression,
   BlockStatement,
   AwaitExpression,
-  Position,
-} from "estree";
+} from "oxc-parser";
 
 export interface TransformerOptions {
   /**
@@ -33,15 +30,7 @@ export interface TransformerOptions {
   objectDefinitions?: Record<string, string[]>;
 }
 
-const kInjected = "__unctx_injected__";
-
-const AWAIT_RE = /(?<![\w$.])await(?![\w$])/;
-
-type MaybeHandledNode = Node & {
-  [kInjected]?: boolean;
-};
-
-export function createTransformer(options: TransformerOptions = {}): {
+export interface Transformer {
   transform: (
     code: string,
     options?: { force?: false },
@@ -50,7 +39,69 @@ export function createTransformer(options: TransformerOptions = {}): {
     code: RegExp;
   };
   shouldTransform: (code: string) => boolean;
+}
+
+const kInjected = "__unctx_injected__";
+
+const AWAIT_RE = /(?<![\w$.])await(?![\w$])/;
+
+type MaybeHandledNode = Node & {
+  [kInjected]?: boolean;
+};
+
+/**
+ * Compute the (synchronous) code filter used to cheaply skip files that cannot
+ * contain a transformable call. This is exposed separately so the plugin can
+ * provide a filter without awaiting the (lazily loaded) transformer.
+ */
+export function getTransformFilter(options: TransformerOptions = {}): {
+  code: RegExp;
 } {
+  const asyncFunctions = options.asyncFunctions ?? ["withAsyncContext"];
+  const objectDefinitionFunctions = Object.keys(
+    options.objectDefinitions ?? {},
+  );
+  return {
+    code: new RegExp(
+      `\\b(${[...asyncFunctions, ...objectDefinitionFunctions].join("|")})\\(`,
+    ),
+  };
+}
+
+/**
+ * Load oxc's `parseSync`, dynamically importing `oxc-parser` and falling back
+ * to `rolldown/utils` (which re-exports the oxc utilities) so that consumers
+ * already depending on rolldown don't need `oxc-parser` installed separately.
+ *
+ * Both are optional peer dependencies, so if neither resolves we surface a
+ * single actionable error that names both options and keeps the underlying
+ * failures around (a broken native binding fails differently from a missing
+ * package, and hiding that makes it undebuggable).
+ */
+async function loadParseSync(): Promise<typeof import("oxc-parser").parseSync> {
+  try {
+    return (await import("oxc-parser")).parseSync;
+  } catch (oxcError) {
+    try {
+      return (await import("rolldown/utils"))
+        .parseSync as typeof import("oxc-parser").parseSync;
+    } catch (rolldownError) {
+      throw new Error(
+        "[unctx] Cannot load an oxc parser. Install `oxc-parser` (or `rolldown`, which re-exports it) to use the unctx transform.",
+        {
+          cause: new AggregateError(
+            [oxcError, rolldownError],
+            "Failed to import `oxc-parser` and `rolldown/utils`",
+          ),
+        },
+      );
+    }
+  }
+}
+
+export async function createTransformer(
+  options: TransformerOptions = {},
+): Promise<Transformer> {
   options = {
     asyncFunctions: ["withAsyncContext"],
     helperModule: "unctx",
@@ -59,23 +110,21 @@ export function createTransformer(options: TransformerOptions = {}): {
     ...options,
   };
 
+  const [parseSync, MagicString] = await Promise.all([
+    loadParseSync(),
+    import("magic-string").then((r) => r.default),
+  ]);
+
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 
-  const matchRE = new RegExp(
-    `\\b(${[...options.asyncFunctions!, ...objectDefinitionFunctions].join(
-      "|",
-    )})\\(`,
-  );
+  const filter = getTransformFilter(options);
+  const matchRE = filter.code;
 
   function shouldTransform(code: string): boolean {
     return (
       typeof code === "string" && matchRE.test(code) && AWAIT_RE.test(code)
     );
   }
-
-  const filter = {
-    code: matchRE,
-  };
 
   function transform(
     code: string,
@@ -84,61 +133,56 @@ export function createTransformer(options: TransformerOptions = {}): {
     if (!options_.force && !shouldTransform(code)) {
       return;
     }
-    const ast = acorn.parse(code, {
+    const parsed = parseSync("", code, {
       sourceType: "module",
-      ecmaVersion: "latest",
-      locations: true,
     });
+    if (parsed.errors.length > 0) {
+      throw new SyntaxError(
+        parsed.errors.map((error) => error.message).join("\n"),
+      );
+    }
 
     const s = new MagicString(code);
-    const lineStarts = [0];
-    let newlineIndex = code.indexOf("\n");
-    while (newlineIndex !== -1) {
-      lineStarts.push(newlineIndex + 1);
-      newlineIndex = code.indexOf("\n", newlineIndex + 1);
-    }
 
     let detected = false;
 
-    walk(ast as any, {
-      enter(node: Node) {
-        if (node.type === "CallExpression") {
-          const functionName = _getFunctionName(node.callee);
-          if (options.asyncFunctions!.includes(functionName)) {
-            transformFunctionArguments(node);
-            if (functionName !== "callAsync") {
-              const lastArgument = node.arguments[node.arguments.length - 1];
-              if (lastArgument && lastArgument.loc) {
-                s.appendRight(toIndex(lastArgument.loc.end), ",1");
-              }
+    walk(parsed.program, function (node: Node) {
+      if (node.type === "CallExpression") {
+        const functionName = _getFunctionName(node.callee);
+        if (options.asyncFunctions!.includes(functionName)) {
+          transformFunctionArguments(node);
+          if (functionName !== "callAsync") {
+            const lastArgument = node.arguments[node.arguments.length - 1];
+            if (lastArgument) {
+              s.appendRight(lastArgument.end, ",1");
             }
           }
-          if (objectDefinitionFunctions.includes(functionName)) {
-            for (const argument of node.arguments) {
-              if (argument.type !== "ObjectExpression") {
+        }
+        if (objectDefinitionFunctions.includes(functionName)) {
+          for (const argument of node.arguments) {
+            if (argument.type !== "ObjectExpression") {
+              continue;
+            }
+
+            for (const property of argument.properties) {
+              if (
+                property.type !== "Property" ||
+                property.key.type !== "Identifier"
+              ) {
                 continue;
               }
 
-              for (const property of argument.properties) {
-                if (
-                  property.type !== "Property" ||
-                  property.key.type !== "Identifier"
-                ) {
-                  continue;
-                }
-
-                if (
-                  options.objectDefinitions![functionName]?.includes(
-                    property.key?.name,
-                  )
-                ) {
-                  transformFunctionBody(property.value);
-                }
+              if (
+                options.objectDefinitions![functionName]?.includes(
+                  property.key?.name,
+                )
+              ) {
+                transformFunctionBody(property.value);
               }
             }
           }
         }
-      },
+      }
     });
 
     if (!detected) {
@@ -154,10 +198,6 @@ export function createTransformer(options: TransformerOptions = {}): {
       code: s.toString(),
       magicString: s,
     };
-
-    function toIndex(pos: Position) {
-      return lineStarts[pos.line - 1] + pos.column;
-    }
 
     function transformFunctionBody(function_: Node) {
       if (
@@ -175,38 +215,33 @@ export function createTransformer(options: TransformerOptions = {}): {
       const body = function_.body as BlockStatement;
 
       let injectVariable = false;
-      walk(body, {
-        enter(
-          node: MaybeHandledNode,
-          parent: MaybeHandledNode | undefined | null,
+      walk(body, function (node: MaybeHandledNode, parent) {
+        if (node.type === "AwaitExpression" && !node[kInjected]) {
+          detected = true;
+          injectVariable = true;
+          injectForNode(node, parent);
+        } else if (
+          node.type === "IfStatement" &&
+          node.consequent.type === "ExpressionStatement" &&
+          node.consequent.expression.type === "AwaitExpression"
         ) {
-          if (node.type === "AwaitExpression" && !node[kInjected]) {
-            detected = true;
-            injectVariable = true;
-            injectForNode(node, parent);
-          } else if (
-            node.type === "IfStatement" &&
-            node.consequent.type === "ExpressionStatement" &&
-            node.consequent.expression.type === "AwaitExpression"
-          ) {
-            detected = true;
-            injectVariable = true;
-            (node.consequent.expression as MaybeHandledNode)[kInjected] = true;
-            injectForNode(node.consequent.expression, node);
-          }
-          // Skip transform for nested functions
-          if (
-            node.type === "ArrowFunctionExpression" ||
-            node.type === "FunctionExpression" ||
-            node.type === "FunctionDeclaration"
-          ) {
-            return this.skip();
-          }
-        },
+          detected = true;
+          injectVariable = true;
+          (node.consequent.expression as MaybeHandledNode)[kInjected] = true;
+          injectForNode(node.consequent.expression, node);
+        }
+        // Skip transform for nested functions
+        if (
+          node.type === "ArrowFunctionExpression" ||
+          node.type === "FunctionExpression" ||
+          node.type === "FunctionDeclaration"
+        ) {
+          return this.skip();
+        }
       });
 
-      if (injectVariable && body.loc) {
-        s.appendLeft(toIndex(body.loc.start) + 1, "let __temp, __restore;");
+      if (injectVariable) {
+        s.appendLeft(body.start + 1, "let __temp, __restore;");
       }
     }
 
@@ -222,21 +257,17 @@ export function createTransformer(options: TransformerOptions = {}): {
     ) {
       const isStatement = parent?.type === "ExpressionStatement";
 
-      if (!node.loc || !node.argument.loc) {
-        return;
-      }
-
-      s.remove(toIndex(node.loc.start), toIndex(node.argument.loc.start));
-      s.remove(toIndex(node.loc.end), toIndex(node.argument.loc.end));
+      s.remove(node.start, node.argument.start);
+      s.remove(node.end, node.argument.end);
 
       s.appendLeft(
-        toIndex(node.argument.loc.start),
+        node.argument.start,
         isStatement
           ? `;(([__temp,__restore]=__executeAsync(()=>`
           : `(([__temp,__restore]=__executeAsync(()=>`,
       );
       s.appendRight(
-        toIndex(node.argument.loc.end),
+        node.argument.end,
         isStatement
           ? `)),await __temp,__restore());`
           : `)),__temp=await __temp,__restore(),__temp)`,
@@ -258,4 +289,49 @@ function _getFunctionName(node: Node): string {
     return _getFunctionName(node.property);
   }
   return "";
+}
+
+type WalkContext = { skip: () => void };
+type WalkEnter = (this: WalkContext, node: Node, parent: Node | null) => void;
+
+/**
+ * Minimal depth-first AST walker. It recurses into every child node
+ * (any nested object/array entry that looks like an AST node)
+ * and invokes `enter` for each. `enter` may call `this.skip()` to avoid descending
+ * into the current node's children.
+ */
+function walk(root: Node, enter: WalkEnter): void {
+  const visit = (node: Node, parent: Node | null): void => {
+    let skipped = false;
+    const context: WalkContext = {
+      skip: () => {
+        skipped = true;
+      },
+    };
+    enter.call(context, node, parent);
+    if (skipped) {
+      return;
+    }
+    for (const key in node) {
+      const value = (node as unknown as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        for (const child of value) {
+          if (isNode(child)) {
+            visit(child, node);
+          }
+        }
+      } else if (isNode(value)) {
+        visit(value, node);
+      }
+    }
+  };
+  visit(root, null);
+}
+
+function isNode(value: unknown): value is Node {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { type?: unknown }).type === "string"
+  );
 }
