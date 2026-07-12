@@ -17,9 +17,7 @@
 In your **awesome** library:
 
 ```bash
-yarn add unctx
-# or
-npm install unctx
+npx nypm i unctx
 ```
 
 ```js
@@ -117,6 +115,12 @@ ctx.call("123", () => {
 ### Async Transform
 
 Since native async context is not supported in all platforms yet, unctx provides a build-time solution that transforms async syntax to automatically restore context after each async/await statement. This requires using a bundler such as Rollup, Vite, or Webpack.
+
+First, install the `unplugin` peer dependency:
+
+```sh
+npx nypm i -D unplugin
+```
 
 Import and register transform plugin:
 
