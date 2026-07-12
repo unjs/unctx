@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v3.0.0-beta.1
+
+[compare changes](https://github.com/unjs/unctx/compare/v2.5.0...v3.0.0-beta.1)
+
+### 🔥 Performance
+
+- **transform:** Skip parsing files without `await` ([#135](https://github.com/unjs/unctx/pull/135))
+- Precompute transform line offsets ([#134](https://github.com/unjs/unctx/pull/134))
+
+### 🩹 Fixes
+
+- Avoid leaking instances via AsyncLocalStorage with WeakRef ([#137](https://github.com/unjs/unctx/pull/137))
+
+### 💅 Refactors
+
+- Strict ts syntax ([7005e81](https://github.com/unjs/unctx/commit/7005e81))
+- ⚠️  Make unplugin an optional peer dep ([bf1c9da](https://github.com/unjs/unctx/commit/bf1c9da))
+
+### 📦 Build
+
+- ⚠️  Esm-only dist ([5af8bee](https://github.com/unjs/unctx/commit/5af8bee))
+
+### 🏡 Chore
+
+- Update deps ([6d61ac8](https://github.com/unjs/unctx/commit/6d61ac8))
+- Update tsconfig ([2d19651](https://github.com/unjs/unctx/commit/2d19651))
+- Prepare for v3 beta ([a95ecea](https://github.com/unjs/unctx/commit/a95ecea))
+
+#### ⚠️ Breaking Changes
+
+- ⚠️  Make unplugin an optional peer dep ([bf1c9da](https://github.com/unjs/unctx/commit/bf1c9da))
+- ⚠️  Esm-only dist ([5af8bee](https://github.com/unjs/unctx/commit/5af8bee))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Alexander Lichter ([@TheAlexLichter](https://github.com/TheAlexLichter))
+- Pi0x <x@pi0.io>
+
 ## v2.5.0
 
 [compare changes](https://github.com/unjs/unctx/compare/v2.4.1...v2.5.0)
