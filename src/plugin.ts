@@ -21,14 +21,21 @@ export interface UnctxPluginOptions extends TransformerOptions {
 
 export const unctxPlugin: UnpluginInstance<UnctxPluginOptions, boolean> =
   createUnplugin((options: UnctxPluginOptions = {}) => {
-    // The transformer is loaded lazily (dynamic oxc import). Cache the resolved
-    // instance so that, once ready, the transform hook can run synchronously
-    // instead of paying an `await` tick on every file.
+    // The transformer resolves asynchronously (dynamic oxc import). Cache the
+    // resolved instance so that, once ready, the transform hook can run
+    // synchronously instead of paying an `await` tick on every file.
     let transformer: Transformer | undefined;
     const transformerPromise = createTransformer(options).then((t) => {
       transformer = t;
       return t;
     });
+
+    // The import starts eagerly, but nothing awaits it until the first matching
+    // file is transformed -- which may never happen. Without this, a failure to
+    // load the parser would surface as an unhandled rejection (and crash the
+    // build) instead of an error on the transform hook. The rejection is still
+    // delivered to the `.then()` below, so real failures are reported in place.
+    transformerPromise.catch(() => {});
 
     const run = (transformer: Transformer, code: string, id: string) => {
       const result = transformer.transform(code);

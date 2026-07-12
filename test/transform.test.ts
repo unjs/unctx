@@ -19,6 +19,16 @@ describe("transforms", () => {
     )?.code;
   }
 
+  it("transforms code on the first line", () => {
+    expect(
+      transformer.transform(
+        "withAsyncContext(async () => { await something() })",
+      )?.code,
+    ).toMatchInlineSnapshot(
+      `"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; ;(([__temp,__restore]=__executeAsync(()=>something())),await __temp,__restore()); },1)"`,
+    );
+  });
+
   it("throws on invalid syntax", () => {
     expect(() =>
       transformer.transform("withAsyncContext(async () => { await task()"),
@@ -323,5 +333,34 @@ describe("transforms", () => {
       },1)
       "
     `);
+  });
+
+  describe("shouldTransform", () => {
+    it("requires both a matched function and an await", () => {
+      // matched function + await -> candidate for transform
+      expect(
+        transformer.shouldTransform(
+          "withAsyncContext(async () => { await x() })",
+        ),
+      ).toBe(true);
+      // matched function but no await -> nothing to rewrite, skip the parse
+      expect(
+        transformer.shouldTransform("withAsyncContext(async () => { x() })"),
+      ).toBe(false);
+      // await but no matched function
+      expect(transformer.shouldTransform("async () => { await x() }")).toBe(
+        false,
+      );
+      // `await` must be the keyword, not part of an identifier
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => awaitable())"),
+      ).toBe(false);
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => obj.await())"),
+      ).toBe(false);
+      expect(
+        transformer.shouldTransform("withAsyncContext(() => $await())"),
+      ).toBe(false);
+    });
   });
 });

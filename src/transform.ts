@@ -72,13 +72,30 @@ export function getTransformFilter(options: TransformerOptions = {}): {
  * Load oxc's `parseSync`, dynamically importing `oxc-parser` and falling back
  * to `rolldown/utils` (which re-exports the oxc utilities) so that consumers
  * already depending on rolldown don't need `oxc-parser` installed separately.
+ *
+ * Both are optional peer dependencies, so if neither resolves we surface a
+ * single actionable error that names both options and keeps the underlying
+ * failures around (a broken native binding fails differently from a missing
+ * package, and hiding that makes it undebuggable).
  */
 async function loadParseSync(): Promise<typeof import("oxc-parser").parseSync> {
   try {
     return (await import("oxc-parser")).parseSync;
-  } catch {
-    return (await import("rolldown/utils"))
-      .parseSync as typeof import("oxc-parser").parseSync;
+  } catch (oxcError) {
+    try {
+      return (await import("rolldown/utils"))
+        .parseSync as typeof import("oxc-parser").parseSync;
+    } catch (rolldownError) {
+      throw new Error(
+        "[unctx] Cannot load an oxc parser. Install `oxc-parser` (or `rolldown`, which re-exports it) to use the unctx transform.",
+        {
+          cause: new AggregateError(
+            [oxcError, rolldownError],
+            "Failed to import `oxc-parser` and `rolldown/utils`",
+          ),
+        },
+      );
+    }
   }
 }
 
