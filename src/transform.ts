@@ -93,10 +93,7 @@ export async function createTransformer(
     ...options,
   };
 
-  const [parseSync, { walk }] = await Promise.all([
-    loadParseSync(),
-    import("oxc-walker"),
-  ]);
+  const parseSync = await loadParseSync();
 
   const objectDefinitionFunctions = Object.keys(options.objectDefinitions!);
 
@@ -129,45 +126,43 @@ export async function createTransformer(
 
     let detected = false;
 
-    walk(parsed.program, {
-      enter(node: Node) {
-        if (node.type === "CallExpression") {
-          const functionName = _getFunctionName(node.callee);
-          if (options.asyncFunctions!.includes(functionName)) {
-            transformFunctionArguments(node);
-            if (functionName !== "callAsync") {
-              const lastArgument = node.arguments[node.arguments.length - 1];
-              if (lastArgument) {
-                s.appendRight(lastArgument.end, ",1");
-              }
+    walk(parsed.program, function (node: Node) {
+      if (node.type === "CallExpression") {
+        const functionName = _getFunctionName(node.callee);
+        if (options.asyncFunctions!.includes(functionName)) {
+          transformFunctionArguments(node);
+          if (functionName !== "callAsync") {
+            const lastArgument = node.arguments[node.arguments.length - 1];
+            if (lastArgument) {
+              s.appendRight(lastArgument.end, ",1");
             }
           }
-          if (objectDefinitionFunctions.includes(functionName)) {
-            for (const argument of node.arguments) {
-              if (argument.type !== "ObjectExpression") {
+        }
+        if (objectDefinitionFunctions.includes(functionName)) {
+          for (const argument of node.arguments) {
+            if (argument.type !== "ObjectExpression") {
+              continue;
+            }
+
+            for (const property of argument.properties) {
+              if (
+                property.type !== "Property" ||
+                property.key.type !== "Identifier"
+              ) {
                 continue;
               }
 
-              for (const property of argument.properties) {
-                if (
-                  property.type !== "Property" ||
-                  property.key.type !== "Identifier"
-                ) {
-                  continue;
-                }
-
-                if (
-                  options.objectDefinitions![functionName]?.includes(
-                    property.key?.name,
-                  )
-                ) {
-                  transformFunctionBody(property.value);
-                }
+              if (
+                options.objectDefinitions![functionName]?.includes(
+                  property.key?.name,
+                )
+              ) {
+                transformFunctionBody(property.value);
               }
             }
           }
         }
-      },
+      }
     });
 
     if (!detected) {
@@ -200,34 +195,29 @@ export async function createTransformer(
       const body = function_.body as BlockStatement;
 
       let injectVariable = false;
-      walk(body, {
-        enter(
-          node: MaybeHandledNode,
-          parent: MaybeHandledNode | undefined | null,
+      walk(body, function (node: MaybeHandledNode, parent) {
+        if (node.type === "AwaitExpression" && !node[kInjected]) {
+          detected = true;
+          injectVariable = true;
+          injectForNode(node, parent);
+        } else if (
+          node.type === "IfStatement" &&
+          node.consequent.type === "ExpressionStatement" &&
+          node.consequent.expression.type === "AwaitExpression"
         ) {
-          if (node.type === "AwaitExpression" && !node[kInjected]) {
-            detected = true;
-            injectVariable = true;
-            injectForNode(node, parent);
-          } else if (
-            node.type === "IfStatement" &&
-            node.consequent.type === "ExpressionStatement" &&
-            node.consequent.expression.type === "AwaitExpression"
-          ) {
-            detected = true;
-            injectVariable = true;
-            (node.consequent.expression as MaybeHandledNode)[kInjected] = true;
-            injectForNode(node.consequent.expression, node);
-          }
-          // Skip transform for nested functions
-          if (
-            node.type === "ArrowFunctionExpression" ||
-            node.type === "FunctionExpression" ||
-            node.type === "FunctionDeclaration"
-          ) {
-            return this.skip();
-          }
-        },
+          detected = true;
+          injectVariable = true;
+          (node.consequent.expression as MaybeHandledNode)[kInjected] = true;
+          injectForNode(node.consequent.expression, node);
+        }
+        // Skip transform for nested functions
+        if (
+          node.type === "ArrowFunctionExpression" ||
+          node.type === "FunctionExpression" ||
+          node.type === "FunctionDeclaration"
+        ) {
+          return this.skip();
+        }
       });
 
       if (injectVariable) {
@@ -279,4 +269,49 @@ function _getFunctionName(node: Node): string {
     return _getFunctionName(node.property);
   }
   return "";
+}
+
+type WalkContext = { skip: () => void };
+type WalkEnter = (this: WalkContext, node: Node, parent: Node | null) => void;
+
+/**
+ * Minimal depth-first AST walker. It recurses into every child node
+ * (any nested object/array entry that looks like an AST node)
+ * and invokes `enter` for each. `enter` may call `this.skip()` to avoid descending
+ * into the current node's children.
+ */
+function walk(root: Node, enter: WalkEnter): void {
+  const visit = (node: Node, parent: Node | null): void => {
+    let skipped = false;
+    const context: WalkContext = {
+      skip: () => {
+        skipped = true;
+      },
+    };
+    enter.call(context, node, parent);
+    if (skipped) {
+      return;
+    }
+    for (const key in node) {
+      const value = (node as unknown as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        for (const child of value) {
+          if (isNode(child)) {
+            visit(child, node);
+          }
+        }
+      } else if (isNode(value)) {
+        visit(value, node);
+      }
+    }
+  };
+  visit(root, null);
+}
+
+function isNode(value: unknown): value is Node {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { type?: unknown }).type === "string"
+  );
 }
