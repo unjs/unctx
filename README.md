@@ -91,9 +91,22 @@ This is not always an elegant and easy way by making a variable and passing it a
 
 ### Native Async Context
 
-Unctx supports Node.js [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, you need to set `asyncContext: true` option and also provides an implementation for `AsyncLocalStorage` (or provide `globalThis.AsyncLocalStorage` polyfill).
+Unctx supports Node.js [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage) as a native way to preserve and track async contexts. To enable this mode, set the `asyncContext: true` option.
 
-See [tc39 proposal for async context](https://github.com/tc39/proposal-async-context) and [cloudflare docs](https://developers.cloudflare.com/workers/runtime-apis/nodejs/asynclocalstorage/) for relevant platform specific docs.
+```ts
+import { createContext } from "unctx";
+
+const ctx = createContext({ asyncContext: true });
+
+ctx.call("123", () => {
+  setTimeout(() => {
+    // Prints 123
+    console.log(ctx.use());
+  }, 100);
+});
+```
+
+The `AsyncLocalStorage` implementation is auto-detected from `globalThis.AsyncLocalStorage` or the `node:async_hooks` built-in module. If neither is available (or you want to use a custom implementation), you can explicitly pass one with the `AsyncLocalStorage` option:
 
 ```ts
 import { createContext } from "unctx";
@@ -102,13 +115,6 @@ import { AsyncLocalStorage } from "node:async_hooks";
 const ctx = createContext({
   asyncContext: true,
   AsyncLocalStorage,
-});
-
-ctx.call("123", () => {
-  setTimeout(() => {
-    // Prints 123
-    console.log(ctx.use());
-  }, 100);
 });
 ```
 

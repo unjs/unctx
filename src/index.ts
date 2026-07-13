@@ -32,8 +32,24 @@ type OnAsyncRestore = () => void;
 type OnAsyncLeave = () => void | OnAsyncRestore;
 
 export interface ContextOptions {
+  /**
+   * Enable native async context support using `AsyncLocalStorage`.
+   */
   asyncContext?: boolean;
+  /**
+   * Custom `AsyncLocalStorage` implementation.
+   *
+   * Defaults to `globalThis.AsyncLocalStorage` or the one from `node:async_hooks` if available.
+   */
   AsyncLocalStorage?: typeof AsyncLocalStorage;
+}
+
+function _getAsyncLocalStorage(): typeof AsyncLocalStorage | undefined {
+  return (
+    (globalThis as any).AsyncLocalStorage ||
+    globalThis.process?.getBuiltinModule?.("node:async_hooks")
+      ?.AsyncLocalStorage
+  );
 }
 
 export function createContext<T = any>(
@@ -51,8 +67,8 @@ export function createContext<T = any>(
   // Async context support
   let als: AsyncLocalStorage<any>;
   if (opts.asyncContext) {
-    const _AsyncLocalStorage: typeof AsyncLocalStorage<any> =
-      opts.AsyncLocalStorage || (globalThis as any).AsyncLocalStorage;
+    const _AsyncLocalStorage: typeof AsyncLocalStorage<any> | undefined =
+      opts.AsyncLocalStorage || _getAsyncLocalStorage();
     if (_AsyncLocalStorage) {
       als = new _AsyncLocalStorage();
     } else {

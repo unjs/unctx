@@ -34,6 +34,21 @@ describe("Async context", () => {
     expect(asl.getStore()).toBe(undefined);
   });
 
+  it("uses the built-in AsyncLocalStorage by default", async () => {
+    const context = createContext({ asyncContext: true });
+
+    await new Promise<void>((resolve) => {
+      context.call("A", () => {
+        setTimeout(() => {
+          expect(context.use()).toBe("A");
+          resolve();
+        }, 1);
+      });
+    });
+
+    expect(context.tryUse()).toBe(undefined);
+  });
+
   it("call and use", async () => {
     const context = createContext({
       asyncContext: true,
