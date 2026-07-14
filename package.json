@@ -26,8 +26,8 @@
   },
   "peerDependencies": {
     "magic-string": "^0.30.21",
-    "oxc-parser": "^0.137.0",
-    "rolldown": "^1.0.0",
+    "oxc-parser": "^0.139.0",
+    "rolldown": "^1.1.5",
     "unplugin": "^3.3.0"
   },
   "peerDependenciesMeta": {
@@ -53,10 +53,10 @@
     "jiti": "^2.7.0",
     "magic-string": "^0.30.21",
     "obuild": "^0.4.38",
-    "oxc-parser": "^0.137.0",
+    "oxc-parser": "^0.139.0",
     "prettier": "^3.9.5",
     "rolldown": "^1.1.5",
-    "typescript": "^6",
+    "typescript": "^6.0.3",
     "unplugin": "^3.3.0",
     "vitest": "^4.1.10"
   },
