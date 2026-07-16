@@ -25,8 +25,8 @@
     "test:types": "tsc --noEmit"
   },
   "peerDependencies": {
-    "magic-string": "^0.30.21",
-    "oxc-parser": "^0.139.0",
+    "magic-string": ">=^0.30.21",
+    "oxc-parser": ">=0.140.0",
     "rolldown": "^1.1.5",
     "unplugin": "^3.3.0"
   },
