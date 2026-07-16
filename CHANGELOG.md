@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v3.0.0
+
+[compare changes](https://github.com/unjs/unctx/compare/v3.0.0-beta.2...v3.0.0)
+
+### 🚀 Enhancements
+
+- Default to built-in `AsyncLocalStorage` ([a2d123d](https://github.com/unjs/unctx/commit/a2d123d))
+
+### 🏡 Chore
+
+- Prepare for stable v3 ([35696ae](https://github.com/unjs/unctx/commit/35696ae))
+- Update deps ([bda295c](https://github.com/unjs/unctx/commit/bda295c))
+- Update deps ([abed6e8](https://github.com/unjs/unctx/commit/abed6e8))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v3.0.0-beta.2
 
 [compare changes](https://github.com/unjs/unctx/compare/v3.0.0-beta.1...v3.0.0-beta.2)

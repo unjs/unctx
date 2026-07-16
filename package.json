@@ -1,6 +1,6 @@
 {
   "name": "unctx",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0",
   "description": "Composition-api in Vanilla js",
   "repository": "unjs/unctx",
   "license": "MIT",
