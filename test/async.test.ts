@@ -99,6 +99,27 @@ describe("callAsync", () => {
     console.warn = _warn;
   });
 
+  it("expression-bodied arrow restores context and returns value", async () => {
+    const context = createContext();
+    const result = await context.callAsync(
+      "A",
+      async () => (await sleep(1).then(() => "x")) + context.use(),
+    );
+    expect(result).toBe("xA");
+  });
+
+  it("withAsyncContext + expression-bodied arrow", async () => {
+    const context = createContext();
+    const _callAsync = context.callAsync; // Skip transform
+    const result = await _callAsync(
+      "A",
+      withAsyncContext(
+        async () => (await sleep(1).then(() => "x")) + context.use(),
+      ),
+    );
+    expect(result).toBe("xA");
+  });
+
   it("await but no async fn", async () => {
     const context = createContext();
     await context.callAsync("A", async () => {
