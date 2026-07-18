@@ -352,7 +352,9 @@ describe("transforms", () => {
     const paramDefinition = transformer.transform(
       "withAsyncContext(async () => await something())",
     )?.code;
-    expect(paramDefinition).toMatchInlineSnapshot(`"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; return ((([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp));},1)"`);
+    expect(paramDefinition).toMatchInlineSnapshot(
+      `"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; return ((([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp));},1)"`,
+    );
   });
 
   describe("shouldTransform", () => {

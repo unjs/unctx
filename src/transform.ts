@@ -1,9 +1,5 @@
 import type MagicString from "magic-string";
-import type {
-  Node,
-  CallExpression,
-  AwaitExpression,
-} from "oxc-parser";
+import type { Node, CallExpression, AwaitExpression } from "oxc-parser";
 
 export interface TransformerOptions {
   /**
