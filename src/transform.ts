@@ -2,7 +2,6 @@ import type MagicString from "magic-string";
 import type {
   Node,
   CallExpression,
-  BlockStatement,
   AwaitExpression,
 } from "oxc-parser";
 
@@ -212,7 +211,8 @@ export async function createTransformer(
         return;
       }
 
-      const body = function_.body as BlockStatement;
+      const body = function_.body;
+      if (!body) return;
 
       let injectVariable = false;
       walk(body, function (node: MaybeHandledNode, parent) {
@@ -241,7 +241,13 @@ export async function createTransformer(
       });
 
       if (injectVariable) {
-        s.appendLeft(body.start + 1, "let __temp, __restore;");
+        if (body.type === "BlockStatement") {
+          s.appendLeft(body.start + 1, "let __temp, __restore;");
+        } else {
+          // Arrow function with an expression body: wrap it in a block statement
+          s.appendLeft(body.start, "{let __temp, __restore; return (");
+          s.appendRight(body.end, ");}");
+        }
       }
     }
 
