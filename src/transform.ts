@@ -191,7 +191,7 @@ export async function createTransformer(
 
     s.appendLeft(
       0,
-      `import { ${options.helperName} as __executeAsync } from "${options.helperModule}";`,
+      `import { ${options.helperName} as __executeAsync } from ${JSON.stringify(options.helperModule)};`,
     );
 
     return {

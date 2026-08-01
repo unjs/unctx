@@ -29,6 +29,18 @@ describe("transforms", () => {
     );
   });
 
+  it("escapes helper module paths", async () => {
+    const transformerWithWindowsPath = await createTransformer({
+      helperModule: String.raw`C:\project\src\index.ts`,
+    });
+
+    expect(
+      transformerWithWindowsPath.transform(
+        "withAsyncContext(async () => { await something() })",
+      )?.code,
+    ).toContain(String.raw`from "C:\\project\\src\\index.ts";`);
+  });
+
   it("throws on invalid syntax", () => {
     expect(() =>
       transformer.transform("withAsyncContext(async () => { await task()"),
