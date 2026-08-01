@@ -46,7 +46,7 @@ describe("Async context", () => {
       });
     });
 
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
   });
 
   it("call and use", async () => {
@@ -55,7 +55,7 @@ describe("Async context", () => {
       AsyncLocalStorage,
     });
 
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
 
     // Rename to avoid async transform
     const _callAsync = context.callAsync;
