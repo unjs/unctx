@@ -26,8 +26,8 @@
   },
   "peerDependencies": {
     "magic-string": ">=0.30.21",
-    "oxc-parser": ">=0.140.0",
-    "rolldown": "^1.1.5",
+    "oxc-parser": ">=0.144.0",
+    "rolldown": "^1.2.4",
     "unplugin": "^3.3.0"
   },
   "peerDependenciesMeta": {
@@ -45,20 +45,20 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.2.0",
     "@vitest/coverage-v8": "^4.1.10",
     "changelogen": "^0.6.2",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.1",
     "eslint-config-unjs": "^0.6.2",
     "jiti": "^2.7.0",
     "magic-string": "^0.30.21",
     "obuild": "^0.4.38",
-    "oxc-parser": "^0.140.0",
-    "prettier": "^3.9.5",
-    "rolldown": "^1.1.5",
+    "oxc-parser": "^0.144.0",
+    "prettier": "^3.9.6",
+    "rolldown": "^1.2.4",
     "typescript": "^6.0.3",
     "unplugin": "^3.3.0",
     "vitest": "^4.1.10"
   },
-  "packageManager": "pnpm@11.12.0"
+  "packageManager": "pnpm@11.22.0"
 }
