@@ -52,6 +52,21 @@ function _getAsyncLocalStorage(): typeof AsyncLocalStorage | undefined {
   );
 }
 
+// Some runtimes (e.g. Cloudflare workerd) don't expose `WeakRef`. Fall back to a
+// strong reference: the instance is no longer GC'd early, but behavior is correct.
+// https://github.com/unjs/unctx/issues/149
+const _WeakRef: typeof WeakRef =
+  globalThis.WeakRef ||
+  (class StrongRef<T extends object> {
+    #value: T;
+    constructor(value: T) {
+      this.#value = value;
+    }
+    deref() {
+      return this.#value;
+    }
+  } as unknown as typeof WeakRef);
+
 export function createContext<T = any>(
   opts: ContextOptions = {},
 ): UseContext<T> {
@@ -84,7 +99,7 @@ export function createContext<T = any>(
   // stored as-is. https://github.com/unjs/unctx/issues/100
   const _wrapInstance = (instance: T) =>
     als && instance !== null && typeof instance === "object"
-      ? { __unctx_weak: new WeakRef(instance as object) }
+      ? { __unctx_weak: new _WeakRef(instance as object) }
       : instance;
   const _unwrapInstance = (store: any) =>
     store && store.__unctx_weak ? store.__unctx_weak.deref() : store;

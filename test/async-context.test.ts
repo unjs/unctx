@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import v8 from "node:v8";
 import vm from "node:vm";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createContext, executeAsync } from "../src/index.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -157,6 +157,32 @@ describe("Async context", () => {
 
         expect(contexts.size).toEqual(1);
       });
+    }
+  });
+});
+
+describe("WeakRef fallback", () => {
+  it("works in runtimes without a global WeakRef (e.g. workerd)", async () => {
+    const original = globalThis.WeakRef;
+    // The shim is resolved at module load, so the module must be re-imported
+    // with `WeakRef` absent from the global scope.
+    delete (globalThis as any).WeakRef;
+    vi.resetModules();
+    try {
+      const { createContext: create } = await import("../src/index.ts");
+      const context = create<{ id: number }>({
+        asyncContext: true,
+        AsyncLocalStorage,
+      });
+      const instance = { id: 1 };
+      await context.callAsync(instance, async () => {
+        expect(context.use()).toBe(instance);
+        await sleep(1);
+      });
+      expect(context.tryUse()).toBe(null);
+    } finally {
+      globalThis.WeakRef = original;
+      vi.resetModules();
     }
   });
 });
