@@ -5,7 +5,7 @@ describe("createContext", () => {
   it("call and use", () => {
     const context = createContext();
     expect(() => context.use()).toThrowError();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
 
     const result = context.call("A", () => {
       expect(context.use()).toBe("A");
@@ -17,7 +17,7 @@ describe("createContext", () => {
 
   it("context conflict", () => {
     const context = createContext();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
     context.call("A", () => {
       expect(() => context.call("B", vi.fn())).toThrow("Context conflict");
     });
@@ -35,11 +35,11 @@ describe("createContext", () => {
 
   it("use async", async () => {
     const context = createContext();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
     const result = await context.call("A", async () => {
       expect(context.use()).toBe("A");
       await Promise.resolve();
-      expect(context.tryUse()).toBe(undefined);
+      expect(context.tryUse()).toBe(null);
       return "OK";
     });
     expect(result).toBe("OK");
@@ -56,13 +56,13 @@ describe("namespace", () => {
 describe("singleton", () => {
   it("set/unset", () => {
     const context = createContext();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
     context.set("A");
     context.set("A");
     expect(context.use()).toBe("A");
     expect(context.use()).toBe("A");
     context.unset();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
   });
 
   it("call compatibility", () => {

@@ -110,7 +110,7 @@ export function createContext<T = any>(
       return _instance;
     },
     tryUse: () => {
-      return _getCurrentInstance();
+      return _getCurrentInstance() ?? null;
     },
     set: (instance: T | undefined, replace?: boolean) => {
       if (!replace) {

@@ -7,7 +7,7 @@ const noop = () => {};
 describe("callAsync", () => {
   it("call and use", async () => {
     const context = createContext();
-    expect(context.tryUse()).toBe(undefined);
+    expect(context.tryUse()).toBe(null);
 
     const result = await Promise.all([
       context.callAsync("A", async () => {
@@ -38,7 +38,7 @@ describe("callAsync", () => {
     await _callAsync("A", async () => {
       expect(context.tryUse()).toBe("A");
       await sleep(1);
-      expect(context.tryUse()).toBe(undefined);
+      expect(context.tryUse()).toBe(null);
     });
   });
 
@@ -90,7 +90,7 @@ describe("callAsync", () => {
       _withAsyncContext(async () => {
         expect(context.use()).toBe("A");
         await sleep(1);
-        expect(context.tryUse()).toBe(undefined);
+        expect(context.tryUse()).toBe(null);
       }),
     );
 
