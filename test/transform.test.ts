@@ -347,6 +347,28 @@ describe("transforms", () => {
     `);
   });
 
+  it("transforms await in arrow function expression bodies", () => {
+    const objectDefinition = transform(`
+      export default defineSomething({
+        someKey: async route => (await something(route.path)).length > 0
+      })
+    `);
+    expect(objectDefinition).toMatchInlineSnapshot(`
+      "import { executeAsync as __executeAsync } from "unctx";
+      export default defineSomething({
+        someKey: async route => {let __temp, __restore; return (((([__temp,__restore]=__executeAsync(()=>something(route.path))),__temp=await __temp,__restore(),__temp)).length > 0);}
+      })
+      "
+    `);
+
+    const paramDefinition = transformer.transform(
+      "withAsyncContext(async () => await something())",
+    )?.code;
+    expect(paramDefinition).toMatchInlineSnapshot(
+      `"import { executeAsync as __executeAsync } from "unctx";withAsyncContext(async () => {let __temp, __restore; return ((([__temp,__restore]=__executeAsync(()=>something())),__temp=await __temp,__restore(),__temp));},1)"`,
+    );
+  });
+
   describe("shouldTransform", () => {
     it("requires both a matched function and an await", () => {
       // matched function + await -> candidate for transform
