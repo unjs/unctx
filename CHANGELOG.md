@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v3.0.1
+
+[compare changes](https://github.com/unjs/unctx/compare/v3.0.0...v3.0.1)
+
+### 🩹 Fixes
+
+- Escape helper module paths in generated imports ([#150](https://github.com/unjs/unctx/pull/150))
+- **transform:** Support async arrows with expression bodies ([#143](https://github.com/unjs/unctx/pull/143))
+- Return null from tryUse when context is unavailable ([#148](https://github.com/unjs/unctx/pull/148))
+- Fallback to strong ref when `WeakRef` is unavailable ([25574ea](https://github.com/unjs/unctx/commit/25574ea))
+
+### 🏡 Chore
+
+- Update deps ([0eb8ff9](https://github.com/unjs/unctx/commit/0eb8ff9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Ulvin ([@UlikGames](https://github.com/UlikGames))
+- Matej Černý <matej.cern@gmail.com>
+
 ## v3.0.0
 
 [compare changes](https://github.com/unjs/unctx/compare/v3.0.0-beta.2...v3.0.0)
