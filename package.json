@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.0",
     "changelogen": "^0.6.2",
     "eslint": "^10.8.1",
     "eslint-config-unjs": "^0.6.2",
@@ -58,7 +58,7 @@
     "rolldown": "^1.2.4",
     "typescript": "^6.0.3",
     "unplugin": "^3.3.0",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "packageManager": "pnpm@11.12.0"
 }
