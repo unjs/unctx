@@ -140,12 +140,16 @@ export function createContext<T = any>(
     },
     call: (instance: T, callback) => {
       checkConflict(instance);
+      // Nesting `call` with the same instance is allowed by `checkConflict`, so the
+      // previous instance has to be restored on exit instead of being cleared, or the
+      // outer context would be lost for the rest of its callback.
+      const previousInstance = currentInstance;
       currentInstance = instance;
       try {
         return als ? als.run(_wrapInstance(instance), callback) : callback();
       } finally {
         if (!isSingleton) {
-          currentInstance = undefined;
+          currentInstance = previousInstance;
         }
       }
     },

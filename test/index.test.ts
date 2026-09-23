@@ -33,6 +33,17 @@ describe("createContext", () => {
     expect(() => context.call("B", throwError)).toThrow("Foo");
   });
 
+  it("nested call with the same instance keeps the outer context", () => {
+    const context = createContext();
+    context.call("A", () => {
+      context.call("A", () => {
+        expect(context.use()).toBe("A");
+      });
+      expect(context.use()).toBe("A");
+    });
+    expect(context.tryUse()).toBe(null);
+  });
+
   it("use async", async () => {
     const context = createContext();
     expect(context.tryUse()).toBe(null);
