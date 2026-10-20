@@ -1,5 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
-import { createContext, createNamespace } from "../src/index.ts";
+import {
+  createContext,
+  createNamespace,
+  defaultNamespace,
+  getContext,
+  useContext,
+} from "../src/index.ts";
 
 describe("createContext", () => {
   it("call and use", () => {
@@ -83,5 +89,16 @@ describe("singleton", () => {
     context.set("A");
     context.set("B", true);
     expect(context.use()).toBe("B");
+  });
+});
+
+describe("defaultNamespace", () => {
+  it("installs the global namespace on first use", () => {
+    expect((globalThis as any).__unctx__).toBeUndefined();
+    const context = getContext("key");
+    expect((globalThis as any).__unctx__).toBeDefined();
+    expect(defaultNamespace.get("key")).toBe(context);
+    context.set("A");
+    expect(useContext("key")()).toBe("A");
   });
 });
