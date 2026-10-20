@@ -156,6 +156,7 @@ export function createContext<T = any>(
       };
       const onLeave: OnAsyncLeave = () =>
         currentInstance === instance ? onRestore : undefined;
+      const asyncHandlers = _getAsyncHandlers();
       asyncHandlers.add(onLeave);
       try {
         const r = als ? als.run(_wrapInstance(instance), callback) : callback();
@@ -203,9 +204,16 @@ const _globalThis = (
 
 const globalKey = "__unctx__";
 
-export const defaultNamespace: ContextNamespace =
-  (_globalThis as any)[globalKey] ||
-  ((_globalThis as any)[globalKey] = createNamespace());
+// Installed on first use to prevent side-effects and allow tree-shaking
+let _defaultNamespace: ContextNamespace | undefined;
+const _getDefaultNamespace = (): ContextNamespace =>
+  (_defaultNamespace ||=
+    (_globalThis as any)[globalKey] ||
+    ((_globalThis as any)[globalKey] = createNamespace()));
+
+export const defaultNamespace: ContextNamespace = {
+  get: (key, opts) => _getDefaultNamespace().get(key, opts),
+};
 
 export const getContext: <T>(
   key: string,
@@ -221,9 +229,11 @@ export const useContext: <T>(key: string, opts?: ContextOptions) => () => T = <
 ) => getContext<T>(key, opts).use;
 
 const asyncHandlersKey = "__unctx_async_handlers__";
-const asyncHandlers: Set<OnAsyncLeave> =
-  (_globalThis as any)[asyncHandlersKey] ||
-  ((_globalThis as any)[asyncHandlersKey] = new Set());
+let _asyncHandlers: Set<OnAsyncLeave> | undefined;
+const _getAsyncHandlers = (): Set<OnAsyncLeave> =>
+  (_asyncHandlers ||=
+    (_globalThis as any)[asyncHandlersKey] ||
+    ((_globalThis as any)[asyncHandlersKey] = new Set()));
 
 type AsyncFunction<T> = () => Promise<T>;
 
@@ -231,7 +241,7 @@ export function executeAsync<T>(
   function_: AsyncFunction<T>,
 ): [Promise<T>, () => void] {
   const restores: OnAsyncRestore[] = [];
-  for (const leaveHandler of asyncHandlers) {
+  for (const leaveHandler of _getAsyncHandlers()) {
     const restore = leaveHandler();
     if (restore) {
       restores.push(restore);
