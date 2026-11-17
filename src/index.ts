@@ -150,6 +150,7 @@ export function createContext<T = any>(
       }
     },
     async callAsync(instance: T, callback) {
+      const previousInstance = currentInstance;
       currentInstance = instance;
       const onRestore: OnAsyncRestore = () => {
         currentInstance = instance;
@@ -160,7 +161,7 @@ export function createContext<T = any>(
       try {
         const r = als ? als.run(_wrapInstance(instance), callback) : callback();
         if (!isSingleton) {
-          currentInstance = undefined;
+          currentInstance = previousInstance;
         }
         return await r;
       } finally {

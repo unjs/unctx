@@ -131,4 +131,13 @@ describe("callAsync", () => {
       return context.use();
     });
   });
+
+  it("nested callAsync keeps the outer context", async () => {
+    const context = createContext();
+    await context.callAsync("A", () => {
+      context.callAsync("A", () => {});
+      expect(context.tryUse()).toBe("A");
+    });
+    expect(context.tryUse()).toBe(null);
+  });
 });
